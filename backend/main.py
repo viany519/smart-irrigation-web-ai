@@ -6,7 +6,7 @@ import numpy as np
 from datetime import datetime
 
 # (opsional) database
-from backend.database import SessionLocal, History
+#from backend.database import SessionLocal, History
 
 app = FastAPI()
 
@@ -51,6 +51,8 @@ class SensorInput(BaseModel):
 # =========================
 @app.post("/predict")
 def predict(data: SensorInput):
+    from backend.database import SessionLocal, History
+
     X = np.array([[
         data.soil_temperature,
         data.soil_moisture,
@@ -102,6 +104,8 @@ def predict(data: SensorInput):
 # =========================
 @app.get("/api/history")
 def get_history(plant: str | None = None):
+    from backend.database import SessionLocal, History
+
     db = SessionLocal()
 
     q = db.query(History)
@@ -117,6 +121,8 @@ def get_history(plant: str | None = None):
 # =========================
 @app.patch("/history/{history_id}/watered")
 def mark_watered(history_id: int):
+    from backend.database import SessionLocal, History
+
     db = SessionLocal()
     row = db.query(History).filter(History.id == history_id).first()
 
