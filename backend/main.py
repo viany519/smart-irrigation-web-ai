@@ -6,7 +6,7 @@ import numpy as np
 from datetime import datetime
 
 # (opsional) database
-from database import SessionLocal, History
+from backend.database import SessionLocal, History
 
 app = FastAPI()
 
