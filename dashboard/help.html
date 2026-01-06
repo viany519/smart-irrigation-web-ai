@@ -186,7 +186,7 @@ async function loadHistoryFromAPI() {
     }
 
     const res = await fetch(
-      `http://127.0.0.1:8000/history?plant_id=${plant.id}`
+     `https://smart-irrigation-web-ai.vercel.app/api/history?plant_id=${plant.id}`
     );
 
     if (!res.ok) {

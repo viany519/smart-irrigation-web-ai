@@ -51,8 +51,6 @@ class SensorInput(BaseModel):
 # =========================
 @app.post("/predict")
 def predict(data: SensorInput):
-    from backend.database import SessionLocal, History
-
     X = np.array([[
         data.soil_temperature,
         data.soil_moisture,
@@ -74,24 +72,7 @@ def predict(data: SensorInput):
     # =========================
     # SAVE HISTORY (TIDAK MERUSAK API)
     # =========================
-    try:
-        db = SessionLocal()
-        row = History(
-            plant=data.plant or "unknown",
-            soil_temperature=data.soil_temperature,
-            soil_moisture=data.soil_moisture,
-            air_humidity=data.air_humidity,
-            need_water=need_water,
-            probability=final_prob,
-            watered=False,
-            timestamp=timestamp
-        )
-        db.add(row)
-        db.commit()
-        db.close()
-    except Exception as e:
-        # kalau DB error, AI tetap jalan
-        print("History save failed:", e)
+   
 
     return {
         "need_water": need_water,
@@ -104,8 +85,6 @@ def predict(data: SensorInput):
 # =========================
 @app.get("/api/history")
 def get_history(plant: str | None = None):
-    from backend.database import SessionLocal, History
-
     db = SessionLocal()
 
     q = db.query(History)
@@ -121,8 +100,6 @@ def get_history(plant: str | None = None):
 # =========================
 @app.patch("/history/{history_id}/watered")
 def mark_watered(history_id: int):
-    from backend.database import SessionLocal, History
-
     db = SessionLocal()
     row = db.query(History).filter(History.id == history_id).first()
 
@@ -135,14 +112,3 @@ def mark_watered(history_id: int):
     db.close()
 
     return {"status": "ok"}
-
-
-import uvicorn, os
-
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", 8000)),
-        reload=False
-    )
