@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Monitoring</title>
+  <link rel="stylesheet" href="./styles.css" />
+
+  <style>
+    /* ===== Monitoring layout tweak (rapi & mirip figma) ===== */
+    .mon-head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+    }
+    .mon-title{
+      font-size:42px; line-height:1.05; margin:0;
+      letter-spacing:-0.5px;
+    }
+    .mon-sub{ margin-top:10px; max-width:760px; }
+    .mon-actions{ display:flex; gap:12px; align-items:center; }
+
+    .mon-grid{
+      display:grid;
+      grid-template-columns: 1.05fr 1fr 0.9fr 1.2fr;
+      gap:14px;
+      margin-top:18px;
+    }
+    .mon-card{ padding:16px 18px; }
+    .mon-k{ font-weight:800; }
+    .mon-v{ font-size:44px; font-weight:900; margin-top:6px; letter-spacing:-0.5px; }
+    .mon-v small{ font-size:16px; font-weight:800; opacity:.85; }
+    .mon-foot{ margin-top:10px; display:flex; gap:10px; align-items:center; color:#6b7280; }
+    .trend{ font-weight:900; }
+
+    .mon-body{
+      display:grid;
+      grid-template-columns: 2fr 1fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
+    }
+
+    .big-plot{ padding:16px 18px; }
+    .plot-title{ font-weight:900; margin:0 0 10px 0; }
+    .donut-wrap{
+      display:flex; gap:18px; align-items:center; justify-content:center;
+      padding:12px 0 6px;
+      min-height:340px;
+    }
+    .donut{
+      width:290px; height:290px; border-radius:50%;
+      background:
+        conic-gradient(#0f5a43 var(--p, 0%), #dbe7e3 0);
+      position:relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,.06) inset;
+    }
+    .donut::before{
+      content:"";
+      position:absolute; inset:60px;
+      background: rgba(255,255,255,.92);
+      border-radius:50%;
+      box-shadow: 0 8px 18px rgba(0,0,0,.05);
+    }
+    .donut-center{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column;
+      font-weight:900;
+      z-index:2;
+    }
+    .donut-center .pct{ font-size:34px; letter-spacing:-0.5px; }
+    .donut-center .lbl{ font-size:12px; font-weight:800; opacity:.7; }
+
+    .mini-pills{
+      margin-top:10px;
+      display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+      padding-bottom:6px;
+    }
+    .mini-pill{
+      display:flex; align-items:center; gap:10px;
+      border:1px solid rgba(13,74,57,.25);
+      border-radius:999px;
+      padding:10px 14px;
+      min-width:240px;
+      background: rgba(255,255,255,.8);
+    }
+    .mini-ico{
+      width:38px; height:38px; border-radius:999px;
+      display:grid; place-items:center;
+      background:#0f5a43;
+    }
+    .mini-ico img{ width:18px; height:18px; object-fit:contain; filter: brightness(10); }
+    .mini-label{ font-size:12px; opacity:.75; font-weight:800; }
+    .mini-value{ font-size:18px; font-weight:900; }
+
+    .side-stack{ display:flex; flex-direction:column; gap:14px; }
+    .status-line{
+      font-weight:900; font-size:26px; margin-top:6px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .status-ok{ color:#0f5a43; }
+    .status-warn{ color:#b42318; }
+    .status-desc{ margin-top:10px; color:#6b7280; font-weight:600; }
+
+    .time-card{
+      padding:16px 18px;
+      background: rgba(15,90,67,.78);
+      color:#fff;
+      border-radius:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .time-card::after{
+      content:"";
+      position:absolute; inset:0;
+      background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+      background-size: 18px 18px;
+      opacity:.55;
+      pointer-events:none;
+    }
+    .time-card > *{ position:relative; z-index:1; }
+    .time-title{ font-weight:900; opacity:.95; }
+    .time-big{ font-size:56px; font-weight:900; letter-spacing:2px; margin-top:8px; }
+    .time-sub{ margin-top:6px; opacity:.9; font-weight:700; }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .form-grid .full{ grid-column: 1 / -1; }
+    .hint{
+      font-size:12px; color:#6b7280; font-weight:600; margin-top:10px;
+    }
+    .ai-box{
+      border:1px dashed rgba(13,74,57,.35);
+      border-radius:12px;
+      padding:10px 12px;
+      margin-top:10px;
+      background: rgba(255,255,255,.65);
+      font-size:12px;
+      color:#374151;
+    }
+    .ai-box b{ color:#0f5a43; }
+  </style>
+</head>
+
+<body class="bg-grid-light" data-page="monitoring">
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+
+          <a data-nav href="./monitoring.html" class="active">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+        </nav>
+
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a data-nav href="./profile.html">
+            <img class="icon" src="./assets/icons/profile.svg" alt="" />
+            Profile
+          </a>
+
+          <a data-nav href="./help.html">
+            <img class="icon" src="./assets/icons/help.svg" alt="" />
+            Help
+          </a>
+
+          <a href="#" data-logout>
+            <img class="icon" src="./assets/icons/logout.svg" alt="" />
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+          <!-- IMPORTANT: ini yang bikin foto profile bisa muncul -->
+          <div class="profile">
+            <img
+              data-user-photo
+              src="./assets/avatar-default.png"
+              alt="avatar"
+              onerror="this.src='./assets/avatar-default.png'"
+            />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+          <div class="mon-head">
+            <div>
+              <h1 class="mon-title" data-mon-title>Plant (Species)</h1>
+              <div class="sub mon-sub">
+                Pantau kondisi tanaman kamu secara real-time dari sensor Arduino (simulasi manual).
+              </div>
+            </div>
+
+            <div class="mon-actions">
+               <button class="btn btn-outline" id="btnPickPlant">Pick plant</button>
+               <button class="btn btn-primary" id="btnBack">Back</button>
+              </div>
+          </div>
+
+          <!-- KPI ROW (sesuai input model AI kamu) -->
+          <div class="mon-grid">
+            <div class="card mon-card">
+              <div class="mon-k">Soil temperature</div>
+              <div class="mon-v"><span data-tempC>—</span><small>°C</small></div>
+              <div class="mon-foot"><span class="trend">▲</span> <span data-tempHint>Monitoring suhu tanah</span></div>
+            </div>
+
+            <div class="card mon-card">
+              <div class="mon-k">Soil moisture now</div>
+              <div class="mon-v"><span data-moistPct>—</span><small>%</small></div>
+              <div class="mon-foot"><span class="trend">▲</span> <span data-moistHint>Monitoring kelembapan tanah</span></div>
+            </div>
+
+            <div class="card mon-card">
+              <div class="mon-k">Air humidity now</div>
+              <div class="mon-v">
+                <span data-humPct>—</span><small>%</small>
+              </div>
+              <div class="mon-foot">
+                <span class="trend">▲</span>
+                <span>Monitoring kelembapan udara</span>
+              </div>
+            </div>
+
+
+      
+
+            <div class="card mon-card">
+              <div class="mon-k">Growth status indicator</div>
+              <div class="status-line status-ok" data-aiStatusLine>✓ Healthy</div>
+              <div class="status-desc" data-aiDesc>
+                Tanaman dalam kondisi baik. Kelengkapan data siap untuk prediksi AI.
+              </div>
+              <div class="water-check hidden" id="waterCheckBox">
+  <label class="checkbox-wrap">
+    <input type="checkbox" id="wateredCheckbox">
+    <span>Tanaman sudah disiram</span>
+  </label>
+</div>
+
+            </div>
+          </div>
+
+
+          <!-- BODY -->
+          <div class="mon-body">
+
+            <!-- LEFT: donut + manual input -->
+            <div class="card big big-plot">
+              <h3 class="plot-title">Soil moisture now</h3>
+
+              <div class="donut-wrap">
+                <div class="donut" id="donut" style="--p:0%;">
+                  <div class="donut-center">
+                    <div class="pct"><span data-donutPct>—</span>%</div>
+                    <div class="lbl">Soil moisture</div>
+                  </div>
+                </div>
+              </div>
+
+            <div class="mini-pills">
+
+  <!-- Soil temperature -->
+  <div class="mini-pill">
+    <div class="mini-ico">
+      <img
+        src="./assets/icon/temperature.png"
+        alt="Temperature icon"
+        onerror="this.src='./assets/icons/temperature.svg'"
+      />
+    </div>
+    <div>
+      <div class="mini-label">Soil temperature now</div>
+      <div class="mini-value">
+        <span data-tempMini>—</span>°C
+      </div>
+    </div>
+  </div>
+
+  <!-- Air humidity -->
+  <div class="mini-pill">
+    <div class="mini-ico">
+      <img
+        src="./assets/icon/humidity.png"
+        alt="Humidity icon"
+        onerror="this.src='./assets/icons/humidity.svg'"
+      />
+    </div>
+    <div>
+      <div class="mini-label">Air humidity now</div>
+      <div class="mini-value">
+        <span data-humMini>—</span>%
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+              <div style="height:10px;"></div>
+
+              <b>Manual input (simulasi Arduino)</b>
+              <div class="hint">
+                Isi nilai sensor secara manual → sistem simpan sebagai “data terbaru” dan akan generate input 
+
+              <form id="sensorForm">
+                <div class="form-grid">
+                  <div>
+                    <div class="muted" style="font-weight:800;">Soil temperature (°C)</div>
+                    <input class="input" id="soil_temperature" type="number" step="0.1" required />
+                  </div>
+                  <div>
+                    <div class="muted" style="font-weight:800;">Soil moisture (%)</div>
+                    <input class="input" id="soil_moisture" type="number" step="0.1" min="0" max="100" required />
+                  </div>
+                 <div>
+                  <div class="muted" style="font-weight:800;">Air humidity (%)</div>
+                  <input class="input" id="air_humidity" type="number" step="0.1" min="0" max="100" required />
+                </div>
+                
+                </div>
+
+                <div style="height:12px;"></div>
+                <div class="row" style="justify-content:flex-end; gap:10px;">
+                  <button type="button" class="btn btn-outline btn-eq" id="btnReset">Reset</button>
+                 <button type="submit" class="btn btn-primary btn-eq" id="btnUpdate">
+                   Update data
+                  </button>
+
+                </div>
+
+               <div class="ai-box" id="aiBox">
+                <div><b>AI input (generated):</b></div>
+                
+                <div class="ai-input-line">
+                  soil_temperature:
+                  <span data-tempOp>—</span>
+                  |
+                  soil_moisture:
+                  <span data-moistOp>—</span>
+                  |
+                  air_humidity:
+                  <span data-humOp>—</span>
+                </div>
+                
+                <!-- PROBABILITY BAR -->
+                 <div class="prob-wrapper">
+                  <div class="prob-label">
+                    AI confidence: <span data-probText>0%</span>
+                  </div>
+                  <div class="prob-bar">
+                    <div class="prob-fill" data-probFill></div>
+                  </div>
+                </div>
+              </div>
+
+
+                  <div class="hint" style="margin-top:6px;">
+                    * Hasil prediksi AI kebutuhan air tanaman dengan kategori tanaman daun dan herba aromatik.
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- RIGHT: notes + time tracker -->
+            <div class="side-stack">
+
+              <div class="card mon-card">
+                <b>Plant notes</b>
+                <div class="muted" style="margin-top:10px; line-height:1.4;" data-notes>
+                  —
+                </div>
+              </div>
+
+              <div class="time-card">
+                <div class="time-title">Time tracker</div>
+                <div class="time-big" data-tracker>00 : 00</div>
+                <div class="time-sub">Last time — refresh</div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+      <!-- /MAIN -->
+    </div>
+  </div>
+
+  <script>
+  window.MONITORING_PAGE_LOADED = true;
+</script>
+
+
+  <script src="./app.js"></script>
+  
+
+  <script>
+    let AI_RESULT_ACTIVE = false;
+    let UI_LOCKED_AFTER_UPDATE = false;
+
+
+    // ======= storage keys (SAMAIN gaya pickplant biar konsisten) =======
+    const KEY_SESSION = "gp_session";
+    const KEY_USERS   = "gp_users";
+    const keyPlants   = (email) => `gp_plants_${email}`;
+    const keyActive   = (email) => `gp_active_plant_${email}`;
+    const keySensor   = (email, plantId) => `gp_sensor_${email}_${plantId}`;
+
+    // ======= helpers =======
+
+    const safePhotoSrc = (s) => {
+      if (typeof s !== "string") return "./assets/avatar-default.png";
+      const v = s.trim();
+      if (!v || v === "null" || v === "undefined") return "./assets/avatar-default.png";
+      if (v.startsWith("data:image/")) return v;
+      if (v.startsWith("./") || v.startsWith("assets/")) return v;
+      return "./assets/avatar-default.png";
+    };
+
+    function historyKey(email, plantId) {
+  return `gp_history_${email}_${plantId}`;
+}
+
+    function getSession() {
+      try { return JSON.parse(localStorage.getItem(KEY_SESSION) || "null"); }
+      catch { return null; }
+    }
+
+    function loadUsers() {
+      try { return JSON.parse(localStorage.getItem(KEY_USERS) || "[]"); }
+      catch { return []; }
+    }
+
+    function getUserByEmail(email) {
+      const users = loadUsers();
+      return users.find(u => String(u.email).toLowerCase() === String(email).toLowerCase());
+    }
+
+    function getCurrentEmail() {
+      const s = getSession();
+      return s?.email || null;
+    }
+
+    function readPlants(email) {
+      try {
+        const arr = JSON.parse(localStorage.getItem(keyPlants(email)) || "[]");
+        if (Array.isArray(arr)) return arr;
+      } catch {}
+      const u = getUserByEmail(email);
+      if (u?.plants && Array.isArray(u.plants)) return u.plants;
+      return [];
+    }
+
+    function getActivePlantId(email) {
+      const fromLS = localStorage.getItem(keyActive(email));
+      if (fromLS) return fromLS;
+      const u = getUserByEmail(email);
+      return u?.selectedPlantId || null;
+    }
+
+    function plantImgSrc(p) {
+      if (p?.photo && typeof p.photo === "string") {
+        const s = p.photo.trim();
+        if (s.startsWith("data:image/")) return s;
+        if (s.startsWith("./") || s.startsWith("assets/")) return s;
+      }
+      return "./assets/basil.png";
+    }
+
+    // ======= TOPBAR render (ini yang beneran bikin avatar muncul) =======
+    function renderTopbar(email) {
+      const u = getUserByEmail(email) || {};
+      const elPhoto = document.querySelector("[data-user-photo]");
+      const elName  = document.querySelector("[data-user-name]");
+      const elEmail = document.querySelector("[data-user-email]");
+
+      if (elPhoto) elPhoto.src = safePhotoSrc(u.photo);
+      if (elName)  elName.textContent = u.name || "User";
+      if (elEmail) elEmail.textContent = email || "user@email.com";
+    }
+
+    function setupLogout() {
+      const btn = document.querySelector("[data-logout]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem(KEY_SESSION);
+        window.location.href = "./login.html";
+      });
+    }
+
+    // ======= Monitoring render =======
+    const TEMP_TH  = 24.5;  // sesuai notebook kamu
+    const MOIST_TH = 90.0;  // sesuai notebook kamu
+
+    function computeOps(tempC, moistPct) {
+      return {
+        soil_temp_op: (tempC > TEMP_TH ? "gt" : "lt"),
+        soil_moisture_op: (moistPct > MOIST_TH ? "gt" : "lt"),
+      };
+    }
+
+   function setTextAll(sel, val) {
+    document.querySelectorAll(sel).forEach(el => {
+      el.textContent = (val ?? "—");
+    });
+  }
+
+ function setText(sel, val) {
+  document.querySelectorAll(sel).forEach(el => {
+    el.textContent = (val ?? "—");
+  });
+}
+
+
+
+
+    function setDonut(pct){
+      const donut = document.getElementById("donut");
+      if (donut) donut.style.setProperty("--p", `${pct}%`);
+      setText("[data-donutPct]", pct);
+    }
+
+    function readSensor(email, plantId) {
+      try {
+        return JSON.parse(localStorage.getItem(keySensor(email, plantId)) || "null");
+      } catch { return null; }
+    }
+
+    function writeSensor(email, plantId, payload) {
+      localStorage.setItem(keySensor(email, plantId), JSON.stringify(payload));
+    }
+
+   function renderMonitoring(email) {
+  // 🔒 HARD LOCK: kalau AI sudah aktif, JANGAN SENTUH UI SAMA SEKALI
+  if (AI_RESULT_ACTIVE) return;
+      const plants = readPlants(email);
+      const activeId = getActivePlantId(email);
+      const plant = plants.find(p => String(p.id) === String(activeId)) || plants[0] || null;
+
+     if (!plant) {
+      setText("[data-mon-title]", "Plant (Species)");
+      setText("[data-notes]", "—");
+      return;
+    }
+
+
+
+
+      // Title + notes
+      const title = `${plant.name || "Plant"}${plant.species ? ` (${plant.species})` : ""}`;
+      setText("[data-mon-title]", title);
+      setText("[data-notes]", plant.notes || plant.description || "—");
+
+      // Sensor data (default)
+     const last = readSensor(email, plant.id);
+     
+    if (last && !UI_LOCKED_AFTER_UPDATE) {
+  setText("[data-tempC]", last.tempC);
+  setText("[data-moistPct]", last.moistPct);
+  setDonut(Number(last.moistPct) || 0);
+  setText("[data-humPct]", last.humPct ?? "—");
+  setText("[data-tempMini]", last.tempC);
+  setText("[data-humMini]", last.humPct ?? "—");
+
+
+  // isi input hanya saat pertama load
+  document.getElementById("soil_temperature").value = last.tempC;
+  document.getElementById("soil_moisture").value = last.moistPct;
+  document.getElementById("air_humidity").value = last.humPct ?? "";
+}
+
+
+
+
+      // Fill inputs
+    //document.getElementById("soil_temperature").value = last.tempC;
+    //document.getElementById("soil_moisture").value = last.moistPct;
+    //document.getElementById("air_humidity").value = last.humPct ?? "";
+
+
+      // KPI fill
+      //setText("[data-tempC]", last.tempC);
+      //setText("[data-moistPct]", last.moistPct);
+    
+
+      // Donut + minis
+      //setDonut(Number(last.moistPct) || 0);
+      //setText("[data-moistMini]", last.moistPct);
+      //setText("[data-humPct]", (last.humPct ?? "—"));
+
+     // AI inputs generated (HANYA JIKA AI BELUM AKTIF)
+if (!AI_RESULT_ACTIVE && last) {
+  const ops = computeOps(Number(last.tempC), Number(last.moistPct));
+  setText("[data-tempOp]", ops.soil_temp_op);
+  setText("[data-moistOp]", ops.soil_moisture_op);
+}
+
+     
+
+      // Status indicator (DEMO rules, nanti ganti ke AI beneran)
+      const minMoist = (typeof plant.minMoist === "number") ? plant.minMoist : 35;
+     let needsWater = false;
+     if (last && typeof last.moistPct === "number") {
+      needsWater = last.moistPct < minMoist;
+    }
+
+
+      const line = document.querySelector("[data-aiStatusLine]");
+      const desc = document.querySelector("[data-aiDesc]");
+
+      // ⛔ JANGAN override status kalau AI sudah aktif
+if (AI_RESULT_ACTIVE) return;
+
+      // JANGAN override status kalau sudah ada hasil AI
+      //if (document.getElementById("aiBox")?.style.display === "block") {
+        //return;
+      //}
+
+      if (needsWater) {
+        if (line) {
+          line.classList.remove("status-ok");
+          line.classList.add("status-warn");
+          line.textContent = "⚠ Needs watering";
+        }
+        if (desc) desc.textContent = `Kelembapan tanah rendah, butuh air!`;
+        document.getElementById("waterCheckBox")?.classList.remove("hidden");
+
+      } else {
+        if (line) {
+          line.classList.remove("status-warn");
+          line.classList.add("status-ok");
+          line.textContent = "✓ Healthy";
+        }
+        if (desc) desc.textContent = `Tanaman dalam kondisi baik.`;
+
+       document.getElementById("waterCheckBox")?.classList.add("hidden");
+
+      }
+    }
+
+    // ===============================
+// CHECKBOX "SUDAH DISIRAM"
+const wateredCheckbox = document.getElementById("wateredCheckbox");
+
+if (wateredCheckbox) {
+  wateredCheckbox.addEventListener("change", () => {
+    if (!wateredCheckbox.checked) return;
+
+    const email = getCurrentEmail();
+    const plantId = getActivePlantId(email);
+    if (!email || !plantId) return;
+
+    const plants = readPlants(email);
+    const plant = plants.find(p => String(p.id) === String(plantId));
+    if (!plant) return;
+
+    // ===== UPDATE HISTORY =====
+    const hKey = `gp_history_${email}_${plantId}`;
+    const history = JSON.parse(localStorage.getItem(hKey) || "[]");
+
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (!history[i].user_watered) {
+        history[i].user_watered = true;
+        history[i].user_watered_at = Date.now();
+        break;
+      }
+    }
+    localStorage.setItem(hKey, JSON.stringify(history));
+
+    // ===== UPDATE NOTIFICATION =====
+    const nKey = `gp_notifications_${email}`;
+    const notifs = JSON.parse(localStorage.getItem(nKey) || "[]");
+
+    for (let i = notifs.length - 1; i >= 0; i--) {
+      if (
+        String(notifs[i].plantId) === String(plantId) &&
+        notifs[i].type === "NEED_WATER" &&
+        notifs[i].user_watered === false
+      ) {
+        notifs[i].user_watered = true;
+        notifs[i].user_watered_at = Date.now();
+        notifs[i].message = `Tanaman ${plant.name} sudah disiram`;
+        break;
+      }
+    }
+
+    localStorage.setItem(nKey, JSON.stringify(notifs));
+  });
+}
+
+
+
+    // ======= Time tracker =======
+    function formatMMSS(ms){
+      const s = Math.floor(ms/1000);
+      const mm = String(Math.floor(s/60)).padStart(2,"0");
+      const ss = String(s%60).padStart(2,"0");
+      return `${mm} : ${ss}`;
+    }
+
+    function initTracker(){
+      const tracker = document.querySelector("[data-tracker]");
+      const baseTs = Date.now();
+      const tick = () => {
+        const ms = Date.now() - baseTs;
+        if (tracker) tracker.textContent = formatMMSS(ms);
+      };
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    // ======= bindings =======
+
+document.addEventListener("DOMContentLoaded", () => {
+  const email = getCurrentEmail();
+  if (!email) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  renderTopbar(email);
+  setupLogout();
+  initTracker();
+  renderMonitoring(email);
+
+  // ===== BUTTON NAVIGATION =====
+  document.getElementById("btnPickPlant")?.addEventListener("click", () => {
+    window.location.href = "./pickplant.html";
+  });
+
+  document.getElementById("btnBack")?.addEventListener("click", () => {
+    window.location.href = "./dashboard.html";
+  });
+
+  // ===== RESET BUTTON =====
+  document.getElementById("btnReset")?.addEventListener("click", () => {
+    document.getElementById("soil_temperature").value = "";
+    document.getElementById("soil_moisture").value = "";
+    document.getElementById("air_humidity").value = "";
+  });
+
+  // ===== UPDATE DATA + AI =====
+ document.getElementById("sensorForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  UI_LOCKED_AFTER_UPDATE = true;
+
+
+
+    const tempC = Number(document.getElementById("soil_temperature").value);
+    const moistPct = Number(document.getElementById("soil_moisture").value);
+    const humPct = Number(document.getElementById("air_humidity").value);
+
+    if ([tempC, moistPct, humPct].some(isNaN)) {
+      alert("Semua input harus diisi");
+      return;
+    }
+    // === SIMPAN DATA SENSOR ===
+const email = getCurrentEmail();
+const plantId = getActivePlantId(email);
+
+const payload = {
+  tempC,
+  moistPct,
+  humPct,
+  ts: Date.now()
+};
+
+
+// ===== AI INPUT (GENERATED) =====
+const ops = computeOps(tempC, moistPct);
+
+setText("[data-tempOp]", ops.soil_temp_op);
+setText("[data-moistOp]", ops.soil_moisture_op);
+setText("[data-humOp]", humPct); // value memang angka, ini OK
+
+
+    const plants = readPlants(email);
+    const activeId = getActivePlantId(email);
+    const plant = plants.find(p => String(p.id) === String(activeId));
+    if (!plant) return;
+
+    // === SIMPAN SENSOR ===
+    writeSensor(email, plant.id, {
+      tempC,
+      moistPct,
+      humPct,
+      ts: Date.now()
+    });
+
+    // ===== SIMPAN HISTORY (PER USER + PER PLANT) =====
+const historyKey = `gp_history_${email}_${plant.id}`;
+const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+
+const needWater = moistPct < (plant.minMoisture ?? 35);
+
+history.push({
+  ts: Date.now(),
+  soil_temperature: tempC,
+  soil_moisture: moistPct,
+  air_humidity: humPct,
+  ai_need_water: needWater,
+  ai_probability: needWater ? 0.8 : 0.2,
+  user_watered: false,
+  user_watered_at: null,
+  source: "monitoring"
+});
+
+localStorage.setItem(historyKey, JSON.stringify(history));
+
+
+// ===== SIMPAN NOTIFICATION (PER USER) =====
+const notifKey = `gp_notifications_${email}`;
+const notifs = JSON.parse(localStorage.getItem(notifKey) || "[]");
+
+notifs.push({
+  plantId: plant.id,
+  plantName: plant.name || "Plant",
+  ts: Date.now(),
+  type: needWater ? "NEED_WATER" : "HEALTHY",
+  message: needWater
+    ? `Tanaman ${plant.name} membutuhkan penyiraman`
+    : `Tanaman ${plant.name} dalam kondisi baik`,
+
+  // 🔽 TAMBAHAN BARU
+  user_watered: false,
+  user_watered_at: null
+});
+
+
+localStorage.setItem(notifKey, JSON.stringify(notifs));
+
+
+    // === SIMPAN TELEMETRY UNTUK HISTORY & NOTIFICATION ===
+localStorage.setItem(
+  "gp:telemetry:last",
+  JSON.stringify({
+    soilMoisture: moistPct,
+    soilTemperature: tempC,
+    airHumidity: humPct,
+    ts: Date.now()
+  })
+);
+
+if (typeof window.maybeLog === "function") {
+  window.maybeLog();
+}
+
+
+
+    // === UPDATE UI ===
+    setText("[data-tempC]", tempC);
+    setText("[data-moistPct]", moistPct);
+    setTextAll("[data-humPct]", humPct);
+    setText("[data-moistMini]", moistPct);
+    setDonut(moistPct);
+
+  // === CALL AI ===
+try {
+  const res = await fetch("http://127.0.0.1:8000/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      soil_moisture: moistPct,
+      soil_temperature: tempC,
+      air_humidity: humPct
+    })
+  });
+
+  const ai = await res.json();
+  const growthPct = Math.round(ai.probability * 100);
+
+  AI_RESULT_ACTIVE = true;
+  document.getElementById("aiBox").style.display = "block";
+
+  const aiBox = document.getElementById("aiBox");
+aiBox.style.display = "block";
+aiBox.style.visibility = "visible";
+aiBox.style.opacity = "1";
+
+
+
+ // === UPDATE AI INPUT (GENERATED) ===
+//setText("[data-tempOp]", tempC);
+//setText("[data-moistOp]", moistPct);
+//setText("[data-humOp]", humPct);
+
+
+  // === PROBABILITY BAR ===
+const probPercent = Math.round(ai.probability * 100);
+
+setText("[data-probText]", `${probPercent}%`);
+const probFill = document.querySelector("[data-probFill]");
+if (probFill) {
+  probFill.style.width = `${probPercent}%`;
+}
+
+
+  // === UPDATE STATUS ===
+  // === UPDATE STATUS (BERDASARKAN KEPUTUSAN AI) ===
+const line = document.querySelector("[data-aiStatusLine]");
+const desc = document.querySelector("[data-aiDesc]");
+const waterBox = document.getElementById("waterCheckBox");
+//const wateredCheckbox = document.getElementById("wateredCheckbox");
+const wateredCheckbox = document.getElementById("wateredCheckbox");
+
+
+
+
+if (ai.need_water === 1) {
+  line.textContent = "⚠ Needs watering";
+  line.classList.remove("status-ok");
+  line.classList.add("status-warn");
+
+  desc.textContent =
+    `AI memutuskan tanaman perlu disiram (confidence ${Math.round(ai.probability * 100)}%)`;
+
+  waterBox.classList.remove("hidden");
+  waterBox.style.display = "block";
+  wateredCheckbox.checked = false;
+
+} else {
+  line.textContent = "✓ Healthy";
+  line.classList.remove("status-warn");
+  line.classList.add("status-ok");
+
+  desc.textContent =
+    `AI memutuskan kondisi aman (confidence ${Math.round(ai.probability * 100)}%)`;
+
+  waterBox.classList.add("hidden");
+  waterBox.style.display = "none";
+  wateredCheckbox.checked = false;
+}
+//wateredCheckbox.onchange = () => {
+  //if (!wateredCheckbox.checked) return;
+
+ //const key = historyKey(email, plantId);
+//const arr = JSON.parse(localStorage.getItem(key) || "[]");
+
+
+  // ambil record TERAKHIR plant ini
+  //for (let i = arr.length - 1; i >= 0; i--) {
+    //if (arr[i].plantId === plant.id && !arr[i].user_watered) {
+      //arr[i].user_watered = true;
+      //arr[i].user_watered_at = Date.now();
+      //break;
+    //}
+  //}
+
+ //localStorage.setItem(key, JSON.stringify(arr));
+//alert("✅ Penyiraman tercatat & tersimpan di history");
+
+// 🔥 FORCE re-render history jika halaman history sedang terbuka
+//if (location.pathname.endsWith("history.html")) {
+  //if (typeof renderHistoryByMetric === "function") {
+    //renderHistoryByMetric();
+  //}
+//}
+//}
+
+
+
+
+} catch (err) {
+  console.error(err);
+  alert("Gagal menghubungi AI server");
+}
+
+
+
+
+  });
+});
+
+
+
+  </script>
+</body>
+</html>

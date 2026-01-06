@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Pick Plant</title>
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- CSS khusus Pick Plant (biar nggak ganggu halaman lain) -->
+  <style>
+    .pp-wrap{ width:100%; }
+    .pp-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .pp-title{ margin:0; font-size:34px; line-height:1.1; font-weight:800; letter-spacing:-.02em; }
+    .pp-sub{ margin:8px 0 0; opacity:.75; }
+    .pp-actions{ display:flex; gap:12px; align-items:center; }
+
+    .pp-board{
+      margin-top:18px;
+      border-radius:22px;
+      padding:22px;
+    }
+
+    /* grid kartu */
+    /* grid kartu: biar ukuran card nggak melebar & lebih mirip figma */
+.pp-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 290px));
+  justify-content:center;
+  gap:26px;
+}
+
+/* kartu mirip figma: lebih compact, ada frame tebal, dan footer grid */
+.pp-card{
+  border-radius:24px;
+  overflow:hidden;
+  border:6px solid #0E4A35;
+  background:#0E4A35;
+  padding:10px;                 /* bikin “frame” seperti figma */
+  box-shadow: 0 14px 34px rgba(0,0,0,.10);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  height: 390px;                /* samain proporsi */
+}
+
+.pp-card.pp-active{
+  outline:4px solid rgba(14,74,53,.18);
+  outline-offset:6px;
+}
+
+.pp-media{
+  background:#fff;
+  border-radius:16px 16px 0 0;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:210px;
+  overflow:hidden;
+}
+.pp-media img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  transform: scale(.96);
+}
+
+.pp-foot{
+  flex:1;
+  border-radius:0 0 16px 16px;
+  padding:14px 16px 16px;
+  color:#fff;
+  text-align:center;
+
+  /* grid halus di area hijau (mirip figma) */
+  background-color:#0E4A35;
+  background-image:
+    linear-gradient(rgba(255,255,255,.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.09) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border-top: 2px solid rgba(255,255,255,.12);
+
+  display:flex;
+  flex-direction:column;
+}
+
+.pp-name{ font-weight:800; font-size:16px; margin:2px 0 0; }
+.pp-spec{ font-size:12px; opacity:.78; margin:4px 0 12px; }
+
+/* tombol: 2 di atas, delete di bawah (lebih rapi) */
+.pp-rowbtn{
+  margin-top:auto;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+  justify-items:center;
+}
+
+.pp-btn{
+  width:100%;
+  height:38px;
+  border-radius:999px;
+  padding:0 16px;
+  font-weight:800;
+  font-size:13px;
+  border:2px solid rgba(255,255,255,.70);
+  background:transparent;
+  color:#fff;
+  cursor:pointer;
+}
+.pp-btn:hover{ background: rgba(255,255,255,.06); }
+.pp-btn:disabled{ opacity:.65; cursor:not-allowed; }
+
+/* state */
+.pp-btn.picked{
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.75);
+  color:#fff;
+}
+.pp-btn.solid{
+  background:#fff;
+  color:#0E4A35;
+  border-color:#fff;
+}
+.pp-btn.danger{
+  background:#fff;
+  color:#C62828;
+  border-color:#fff;
+  grid-column: 1 / -1;     /* delete full row */
+  max-width: 190px;
+}
+
+.pp-badge{
+  margin-top:12px;
+  font-weight:800;
+  font-size:13px;
+  opacity:.9;
+}
+
+    /* modal edit */
+    .pp-modal[hidden]{ display:none; }
+    .pp-modal{
+      position:fixed; inset:0;
+      z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      padding:18px;
+    }
+    .pp-backdrop{
+      position:absolute; inset:0;
+      background:rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+    }
+    .pp-panel{
+      position:relative;
+      width:min(720px, 100%);
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    }
+    .pp-panel h2{ margin:0; font-size:20px; }
+    .pp-formgrid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .pp-formgrid .full{ grid-column:1 / -1; }
+    .pp-label{ font-size:12px; opacity:.7; margin:0 0 6px; }
+    .pp-panel .input{ width:100%; }
+    .pp-panel .row{ display:flex; gap:12px; justify-content:flex-end; align-items:center; }
+  </style>
+</head>
+
+<body class="bg-grid-light" data-page="pickplant">
+
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+          <a data-nav href="./monitoring.html">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+          <a data-nav href="./pickplant.html" class="active">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Pick plant
+          </a>
+        </nav>
+
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a data-nav href="./profile.html">
+            <img class="icon" src="./assets/icons/profile.svg" alt="" />
+            Profile
+          </a>
+          <a data-nav href="./help.html">
+            <img class="icon" src="./assets/icons/help.svg" alt="" />
+            Help
+          </a>
+          <a href="#" data-logout>
+            <img class="icon" src="./assets/icons/logout.svg" alt="" />
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+       <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" alt="avatar" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content pp-wrap">
+
+          <div class="pp-head">
+            <div>
+              <h1 class="pp-title">Pick plant</h1>
+              <p class="pp-sub">Pilih tanaman yang mau kamu tampilkan di dashboard.</p>
+            </div>
+
+            <div class="pp-actions">
+              <a class="btn btn-outline btn-eq" href="./dashboard.html">Back</a>
+              <a class="btn btn-primary btn-eq" href="./addplant.html">+ Add plant</a>
+            </div>
+          </div>
+
+          <div class="card big pp-board">
+            <div id="ppGrid" class="pp-grid"></div>
+            <div id="ppEmpty" class="muted" style="margin-top:10px; display:none;">
+              Belum ada plant. Klik <b>Add plant</b> dulu ya.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+
+  <!-- Modal Edit -->
+  <div class="pp-modal" id="editModal" hidden>
+    <div class="pp-backdrop" data-close></div>
+    <div class="pp-panel">
+      <h2>Edit plant</h2>
+
+      <form id="editForm">
+        <input type="hidden" id="editId" />
+
+        <div class="pp-formgrid">
+          <div>
+            <div class="pp-label">Plant name</div>
+            <input class="input" id="editName" required />
+          </div>
+          <div>
+            <div class="pp-label">Scientific name</div>
+            <input class="input" id="editSpecies" />
+          </div>
+
+          <div>
+            <div class="pp-label">Planted on</div>
+            <input class="input" id="editPlantedOn" type="date" />
+          </div>
+          <div>
+            <div class="pp-label">Growth status</div>
+            <input class="input" id="editGrowth" />
+          </div>
+
+          <div class="full">
+            <div class="pp-label">Description</div>
+            <textarea class="input" id="editDesc" rows="3"></textarea>
+          </div>
+
+          <div>
+            <div class="pp-label">Min soil moisture (%)</div>
+            <input class="input" id="editMinMoist" type="number" min="0" max="100" />
+          </div>
+          <div>
+            <div class="pp-label">Notes</div>
+            <input class="input" id="editNotes" />
+          </div>
+
+          <div class="full">
+            <div class="pp-label">Change photo (optional)</div>
+            <input id="editPhoto" type="file" accept="image/*" />
+          </div>
+        </div>
+
+        <div style="height:14px;"></div>
+        <div class="row">
+          <button type="button" class="btn btn-outline btn-eq" id="editCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-eq">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ======= storage keys (SAMAIN sama app.js kamu) =======
+    const KEY_SESSION = "gp_session";
+    const KEY_USERS   = "gp_users";
+    const keyPlants   = (email) => `gp_plants_${email}`;
+    const keyActive   = (email) => `gp_active_plant_${email}`;
+    const keyPump     = (email, plantId) => `gp_pump_${email}_${plantId}`;
+    const keySensor   = (email, plantId) => `gp_sensor_${email}_${plantId}`;
+
+    // ======= helpers =======
+    const safePhotoSrc = (s) => {
+      if (typeof s !== "string") return "./assets/avatar-default.png";
+      const v = s.trim();
+      if (!v || v === "null" || v === "undefined") return "./assets/avatar-default.png";
+      if (v.startsWith("data:image/")) return v;
+      if (v.startsWith("./") || v.startsWith("assets/")) return v;
+      return "./assets/avatar-default.png";
+    };
+
+    function getSession() {
+      try { return JSON.parse(localStorage.getItem(KEY_SESSION) || "null"); }
+      catch { return null; }
+    }
+
+    function loadUsers() {
+      try { return JSON.parse(localStorage.getItem(KEY_USERS) || "[]"); }
+      catch { return []; }
+    }
+    function saveUsers(users) {
+      localStorage.setItem(KEY_USERS, JSON.stringify(users));
+    }
+
+    function getCurrentUserEmailFallback() {
+      // 1) session
+      const s = getSession();
+      if (s?.email) return s.email;
+
+      // 2) kalau nggak ada session, coba ambil user pertama biar halaman nggak “mati”
+      const users = loadUsers();
+      if (users[0]?.email) return users[0].email;
+
+      return null;
+    }
+
+    function getUserByEmail(email) {
+      const users = loadUsers();
+      return users.find(u => String(u.email).toLowerCase() === String(email).toLowerCase());
+    }
+
+    function readPlants(email) {
+      // prioritas: storage per email
+      try {
+        const arr = JSON.parse(localStorage.getItem(keyPlants(email)) || "[]");
+        if (Array.isArray(arr) && arr.length) return arr;
+      } catch {}
+
+      // fallback: dari user.plants
+      const u = getUserByEmail(email);
+      if (u?.plants && Array.isArray(u.plants)) return u.plants;
+
+      return [];
+    }
+
+    function writePlants(email, plants) {
+      localStorage.setItem(keyPlants(email), JSON.stringify(plants));
+
+      // sinkron ke gp_users juga biar konsisten
+      const users = loadUsers();
+      const idx = users.findIndex(u => String(u.email).toLowerCase() === String(email).toLowerCase());
+      if (idx >= 0) {
+        users[idx].plants = plants;
+        saveUsers(users);
+      }
+    }
+
+    function getActivePlantId(email) {
+      const fromLS = localStorage.getItem(keyActive(email));
+      if (fromLS) return fromLS;
+
+      const u = getUserByEmail(email);
+      return u?.selectedPlantId || null;
+    }
+
+    function setActivePlantId(email, plantId) {
+      localStorage.setItem(keyActive(email), plantId);
+
+      // sinkron ke user
+      const users = loadUsers();
+      const idx = users.findIndex(u => String(u.email).toLowerCase() === String(email).toLowerCase());
+      if (idx >= 0) {
+        users[idx].selectedPlantId = plantId;
+        saveUsers(users);
+      }
+    }
+
+    function plantImgSrc(p) {
+      if (p?.photo && typeof p.photo === "string") {
+        const s = p.photo.trim();
+        if (s.startsWith("data:image/")) return s;
+        if (s.startsWith("./") || s.startsWith("assets/")) return s;
+      }
+      return "./assets/basil.png";
+    }
+
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+
+    // ======= topbar render =======
+    function renderTopbar(email) {
+      const u = getUserByEmail(email) || {};
+      const elPhoto = document.querySelector("[data-user-photo]");
+      const elName  = document.querySelector("[data-user-name]");
+      const elEmail = document.querySelector("[data-user-email]");
+
+      if (elPhoto) elPhoto.src = safePhotoSrc(u.photo);
+      if (elName)  elName.textContent = u.name || "User";
+      if (elEmail) elEmail.textContent = email || "user@email.com";
+    }
+
+    // ======= logout =======
+    function setupLogout() {
+      const btn = document.querySelector("[data-logout]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem(KEY_SESSION);
+        window.location.href = "./login.html";
+      });
+    }
+
+    // ======= render cards =======
+    function renderPickCards(email) {
+      const grid = document.getElementById("ppGrid");
+      const empty = document.getElementById("ppEmpty");
+      grid.innerHTML = "";
+
+      const plants = readPlants(email);
+      const activeId = getActivePlantId(email);
+
+      if (!plants.length) {
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+
+      plants.forEach(p => {
+        const isActive = String(p.id) === String(activeId);
+
+        const card = document.createElement("div");
+        card.className = "pp-card" + (isActive ? " pp-active" : "");
+
+        card.innerHTML = `
+          <div class="pp-media">
+            <img src="${plantImgSrc(p)}" alt="plant" />
+          </div>
+          <div class="pp-foot">
+            <div class="pp-name">${p.name || "Plant"}</div>
+            <div class="pp-spec">${p.species || ""}</div>
+
+            <div class="pp-rowbtn">
+                <button class="pp-btn ${isActive ? "picked" : "solid"}" data-pick="${p.id}" ${isActive ? "disabled" : ""}>
+                     ${isActive ? "Plant Picked" : "+ Pick plant"}
+                     </button>
+                     <button class="pp-btn solid" data-edit="${p.id}">Edit</button>
+                     <button class="pp-btn danger" data-del="${p.id}">Delete</button>
+                     </div>
+
+
+            ${isActive ? `<div class="pp-badge">Plant picked</div>` : ``}
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      // bind actions
+      grid.querySelectorAll("[data-pick]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-pick");
+          setActivePlantId(email, id);
+          window.location.href = "./dashboard.html";
+        });
+      });
+
+      grid.querySelectorAll("[data-del]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-del");
+          const plants = readPlants(email);
+          const next = plants.filter(x => String(x.id) !== String(id));
+
+          // bersihin data terkait (opsional tapi rapi)
+          localStorage.removeItem(keyPump(email, id));
+          localStorage.removeItem(keySensor(email, id));
+
+          writePlants(email, next);
+
+          const activeNow = getActivePlantId(email);
+          if (String(activeNow) === String(id)) {
+            setActivePlantId(email, next[0]?.id || "");
+          }
+
+          renderPickCards(email);
+        });
+      });
+
+      grid.querySelectorAll("[data-edit]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-edit");
+          openEdit(email, id);
+        });
+      });
+    }
+
+    // ======= edit modal =======
+    const editModal = document.getElementById("editModal");
+    const editForm  = document.getElementById("editForm");
+    const editId    = document.getElementById("editId");
+
+    const editName     = document.getElementById("editName");
+    const editSpecies  = document.getElementById("editSpecies");
+    const editPlanted  = document.getElementById("editPlantedOn");
+    const editGrowth   = document.getElementById("editGrowth");
+    const editDesc     = document.getElementById("editDesc");
+    const editMinMoist = document.getElementById("editMinMoist");
+    const editNotes    = document.getElementById("editNotes");
+    const editPhoto    = document.getElementById("editPhoto");
+
+    let editPhotoData = "";
+
+    function openEdit(email, id) {
+      const plants = readPlants(email);
+      const p = plants.find(x => String(x.id) === String(id));
+      if (!p) return;
+
+      editId.value = p.id;
+      editName.value = p.name || "";
+      editSpecies.value = p.species || "";
+      editPlanted.value = (p.plantedOn && p.plantedOn !== "-") ? p.plantedOn : "";
+      editGrowth.value = p.growth || "";
+      editDesc.value = p.description || "";
+      editMinMoist.value = (p.minMoisture ?? 30);
+      editNotes.value = p.notes || "";
+      editPhoto.value = "";
+      editPhotoData = "";
+
+      editModal.hidden = false;
+    }
+
+    function closeEdit() {
+      editModal.hidden = true;
+    }
+
+    editModal.addEventListener("click", (e) => {
+      if (e.target?.hasAttribute("data-close")) closeEdit();
+    });
+    document.getElementById("editCancel").addEventListener("click", closeEdit);
+
+    editPhoto.addEventListener("change", async () => {
+      const f = editPhoto.files?.[0];
+      if (!f) return;
+      editPhotoData = await fileToDataURL(f);
+    });
+
+    editForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = window.__ppEmail;
+      const id = editId.value;
+
+      const plants = readPlants(email);
+      const idx = plants.findIndex(x => String(x.id) === String(id));
+      if (idx < 0) return;
+
+      plants[idx] = {
+        ...plants[idx],
+        name: editName.value.trim(),
+        species: editSpecies.value.trim(),
+        plantedOn: editPlanted.value || "-",
+        growth: editGrowth.value.trim(),
+        description: editDesc.value.trim(),
+        minMoisture: Number(editMinMoist.value || 30),
+        notes: editNotes.value.trim(),
+        photo: editPhotoData || plants[idx].photo || ""
+      };
+
+      writePlants(email, plants);
+      closeEdit();
+      renderPickCards(email);
+    });
+
+    // ======= init =======
+    document.addEventListener("DOMContentLoaded", () => {
+      const email = getCurrentUserEmailFallback();
+      window.__ppEmail = email;
+
+      renderTopbar(email);
+      setupLogout();
+
+      if (!email) {
+        document.getElementById("ppEmpty").style.display = "block";
+        document.getElementById("ppEmpty").innerHTML = "Session belum ada. Silakan login dulu.";
+        return;
+      }
+
+      renderPickCards(email);
+    });
+  </script>
+</body>
+</html>

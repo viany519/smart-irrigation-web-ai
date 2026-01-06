@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Profile</title>
+  <link rel="stylesheet" href="./styles.css" />
+
+  <style>
+    .profile-card { max-width: 980px; }
+    .profile-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+    .profile-user { display:flex; gap:14px; align-items:center; }
+    .avatar-xl { width:72px; height:72px; border-radius:999px; object-fit:cover; border:1px solid rgba(0,0,0,0.10); }
+    .kv { display:grid; grid-template-columns: 140px 1fr; gap:10px; margin-top: 14px; }
+    .kv > div { padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .actions { display:flex; gap:10px; justify-content:flex-end; margin-top:14px; }
+    .hint { font-size:12px; margin-top:10px; }
+    .field { display:grid; gap:8px; }
+    .grid-2f { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media (max-width: 900px){ .grid-2f { grid-template-columns: 1fr; } }
+
+    /* biar aman dari overlay */
+    .content, .card, form, input, select, textarea { position: relative; z-index: 2; }
+
+    /* ===== FIX UTAMA: input edit biar jelas ===== */
+    #editMode .input,
+    #editMode input,
+    #editMode textarea,
+    #editMode select {
+      background: rgba(255,255,255,0.92);
+      color: #0b1b14;
+      border: 1px solid rgba(11,27,20,0.18);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    #editMode .input::placeholder,
+    #editMode input::placeholder,
+    #editMode textarea::placeholder {
+      color: rgba(11,27,20,0.55);
+    }
+    #editMode label.muted {
+      color: rgba(11,27,20,0.70);
+      font-weight: 700;
+    }
+
+    /* Samain ukuran tombol Back & Edit (+ Cancel/Save juga) */
+    .actions .btn,
+    .actions a.btn,
+    .actions button.btn {
+      font-size: 14px;
+      font-weight: 700;
+      height: 44px;
+      line-height: 44px;
+      padding: 0 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body class="bg-grid-light">
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+
+          <a data-nav href="./monitoring.html">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+        </nav>
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a href="./profile.html" class="active">
+    <img class="icon" src="./assets/icons/profile.svg" />
+    Profile
+  </a>
+
+  <a href="./help.html">
+    <img class="icon" src="./assets/icons/help.svg" />
+    Help
+  </a>
+
+  <a href="#" data-logout>
+    <img class="icon" src="./assets/icons/logout.svg" />
+    Logout
+  </a>
+</nav>
+
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+       <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" alt="avatar" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+          <h1 class="h1">Profile</h1>
+          <p class="sub">Manage your account biodata for the dashboard.</p>
+
+          <div style="height:18px;"></div>
+
+          <!-- SINGLE CARD -->
+          <div class="card profile-card">
+
+            <div class="profile-head">
+              <div>
+                <h3 style="margin:0 0 6px 0;">Your Biodata</h3>
+                <p class="muted" style="margin:0;">You can update your information anytime :)</p>
+              </div>
+            </div>
+
+            <div style="height:14px;"></div>
+
+            <!-- VIEW MODE -->
+            <div id="viewMode">
+              <div class="profile-user">
+                <img id="viewPhoto" class="avatar-xl" src="./assets/avatar-default.png" alt="avatar">
+                <div class="col" style="gap:4px;">
+                  <div style="font-weight:900;font-size:16px;" id="viewName">User</div>
+                  <div class="muted" id="viewEmail">user@email.com</div>
+                </div>
+              </div>
+
+              <div class="kv">
+                <div class="muted">Country</div><div><b id="viewCountry">-</b></div>
+                <div class="muted">City</div><div><b id="viewCity">-</b></div>
+                <div class="muted">Phone</div><div><b id="viewPhone">-</b></div>
+              </div>
+
+              <div style="height:10px;"></div>
+              <div class="box">
+                <b>About</b>
+                <p class="muted" id="viewAbout" style="margin-top:6px;">-</p>
+              </div>
+
+              <!-- tombol kanan bawah: Back + Edit -->
+              <div class="actions">
+                <a class="btn btn-outline" href="./dashboard.html">Back</a>
+                <button class="btn btn-primary" id="btnEdit" type="button">Edit</button>
+              </div>
+            </div>
+
+
+            <!-- EDIT MODE -->
+            <div id="editMode" hidden>
+              <form id="profileForm" class="col" style="gap:12px;">
+
+                <div class="row" style="gap:14px; align-items:center;">
+                  <img id="editPhotoPreview" class="avatar-xl" src="./assets/avatar-default.png" alt="avatar">
+                  <div class="col" style="gap:8px; flex:1;">
+                    <div class="field">
+                      <label class="muted">Profile photo</label>
+                      <input id="photoInput" type="file" accept="image/*" class="input" />
+                    </div>
+                    <div id="msgPhoto" class="muted hint"></div>
+                  </div>
+                </div>
+
+                <div class="grid-2f">
+                  <div class="field">
+                    <label class="muted">Name</label>
+                    <input class="input" name="name" placeholder="Your name" required />
+                  </div>
+
+                  <div class="field">
+                    <label class="muted">Email</label>
+                    <input class="input" name="email" type="email" placeholder="you@email.com" required />
+                  </div>
+                </div>
+
+                <div class="grid-2f">
+                  <div class="field">
+                    <label class="muted">Country</label>
+                    <input class="input" name="country" placeholder="Indonesia" />
+                  </div>
+
+                  <div class="field">
+                    <label class="muted">City</label>
+                    <input class="input" name="city" placeholder="Jakarta" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="muted">Phone Number</label>
+                  <input class="input" name="phone" type="tel" placeholder="+62xxxxxxxxxx" />
+                </div>
+
+                <div class="field">
+                  <label class="muted">About</label>
+                  <textarea class="input" name="about" rows="3" placeholder="Short bio..."></textarea>
+                </div>
+
+                <div id="msgProfile" class="muted hint"></div>
+
+                <!-- tombol kanan bawah: Back + Cancel + Save -->
+                <div class="actions">
+                  <a class="btn btn-outline" href="./dashboard.html">Back</a>
+                  <button class="btn btn-outline" id="btnCancel" type="button">Cancel</button>
+                  <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+          <!-- /card -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    const viewMode = document.getElementById("viewMode");
+    const editMode = document.getElementById("editMode");
+    const btnEdit = document.getElementById("btnEdit");
+
+    const form = document.getElementById("profileForm");
+    const msgProfile = document.getElementById("msgProfile");
+
+    const photoInput = document.getElementById("photoInput");
+    const msgPhoto = document.getElementById("msgPhoto");
+
+    const viewPhoto = document.getElementById("viewPhoto");
+    const editPhotoPreview = document.getElementById("editPhotoPreview");
+
+    const viewName = document.getElementById("viewName");
+    const viewEmail = document.getElementById("viewEmail");
+    const viewCountry = document.getElementById("viewCountry");
+    const viewCity = document.getElementById("viewCity");
+    const viewPhone = document.getElementById("viewPhone");
+    const viewAbout = document.getElementById("viewAbout");
+
+    function renderView(user){
+      const fallback = "./assets/avatar-default.png";
+      const photo = user.photo || fallback;
+
+      viewPhoto.src = photo;
+      viewName.textContent = user.name || "User";
+      viewEmail.textContent = user.email || "-";
+      viewCountry.textContent = user.country?.trim() ? user.country : "-";
+      viewCity.textContent = user.city?.trim() ? user.city : "-";
+      viewPhone.textContent = user.phone?.trim() ? user.phone : "-";
+      viewAbout.textContent = user.about?.trim() ? user.about : "-";
+    }
+
+    function fillForm(user){
+      form.name.value = user.name || "";
+      form.email.value = user.email || "";
+      form.country.value = user.country || "";
+      form.city.value = user.city || "";
+      form.phone.value = user.phone || "";
+      form.about.value = user.about || "";
+
+      const fallback = "./assets/avatar-default.png";
+      const photo = user.photo || fallback;
+      editPhotoPreview.src = photo;
+    }
+
+    function openEdit(){
+      const user = window.GPData?.getCurrentUser?.();
+      if (!user) return;
+      fillForm(user);
+      msgProfile.textContent = "";
+      msgPhoto.textContent = "";
+      viewMode.hidden = true;
+      editMode.hidden = false;
+    }
+
+    function closeEdit(){
+      viewMode.hidden = false;
+      editMode.hidden = true;
+      photoInput.value = "";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = window.GPData?.getCurrentUser?.();
+      if (!user) return;
+      renderView(user);
+    });
+
+    btnEdit.addEventListener("click", openEdit);
+
+    document.getElementById("btnCancel").addEventListener("click", () => {
+      closeEdit();
+    });
+
+    photoInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        msgPhoto.textContent = "File harus gambar (jpg/png).";
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        msgPhoto.textContent = "Ukuran gambar max 2MB.";
+        return;
+      }
+
+      msgPhoto.textContent = "Uploading...";
+      const res = await window.GPAuth.updatePhoto(file);
+
+      if (!res.ok) {
+        msgPhoto.textContent = res.message || "Upload gagal.";
+        return;
+      }
+
+      const user = window.GPData.getCurrentUser();
+      editPhotoPreview.src = user.photo || "./assets/avatar-default.png";
+      msgPhoto.textContent = "Photo updated!";
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      msgProfile.textContent = "";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      const res = window.GPData.updateProfile(data);
+      if (!res.ok) {
+        msgProfile.textContent = res.message || "Gagal update profile.";
+        return;
+      }
+
+      const user = window.GPData.getCurrentUser();
+      renderView(user);
+
+      msgProfile.textContent = "Saved!";
+      closeEdit();
+    });
+  </script>
+</body>
+</html>

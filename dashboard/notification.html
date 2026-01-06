@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Notification</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .notif-wrap{ overflow:auto; border-radius: 18px; }
+    .notif-table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background:#fff;
+    }
+    .notif-table thead th{
+      background: var(--green);
+      color:#fff;
+      text-align:left;
+      padding: 12px 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .notif-table tbody td{
+      padding: 12px 14px;
+      border-top: 1px solid var(--line-2);
+      vertical-align: top;
+      color: var(--text);
+    }
+    .notif-table tbody tr:hover td{
+      background: rgba(15, 90, 68, .04);
+    }
+    .badge{
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      border: 1px solid rgba(15, 90, 68, .25);
+      color: var(--green);
+      background: rgba(15, 90, 68, .06);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body class="bg-grid-light" data-page="notification">
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+
+          <a data-nav href="./monitoring.html">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+        </nav>
+
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a data-nav href="./profile.html">
+            <img class="icon" src="./assets/icons/profile.svg" alt="" />
+            Profile
+          </a>
+
+          <a data-nav href="./help.html">
+            <img class="icon" src="./assets/icons/help.svg" alt="" />
+            Help
+          </a>
+
+          <a href="#" data-logout>
+            <img class="icon" src="./assets/icons/logout.svg" alt="" />
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+      <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" alt="avatar" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+          <div class="row" style="justify-content: space-between; align-items: center;">
+            <div>
+              <h1 class="h1">Notification</h1>
+              <p class="sub">Riwayat notifikasi penyiraman & kondisi kelembapan.</p>
+            </div>
+          </div>
+
+          <div style="height:18px;"></div>
+
+          <div class="card big">
+            <div class="notif-wrap">
+              <table class="notif-table">
+               <thead>
+                <tr>
+                  <th>Plant name</th>
+                  <th>Time</th>
+                  <th>Kondisi Tanaman</th>
+                  <th>Aktivitas</th>
+                </tr>
+              </thead>
+
+                <tbody id="notifBody">
+                  <!-- diisi via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="notifEmpty" class="muted" style="margin-top:12px; display:none;">
+              Belum ada notifikasi.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+ 
+  
+ <script src="./app.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof renderNotifications === "function") {
+      renderNotifications();
+    }
+  });
+</script>
+
+</body>
+</html>

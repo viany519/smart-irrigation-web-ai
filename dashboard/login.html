@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Login</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body class="bg-grid-dark">
+  <div class="shell">
+    <div class="app login-app" style="min-height: calc(100vh - 44px);">
+      <!-- LEFT -->
+      <section class="login-left">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <form class="login-form" id="loginForm">
+          <div class="field">
+            <input class="input" type="email" placeholder="Enter your email" required />
+          </div>
+         <div class="field password-field">
+  <input class="input" id="loginPassword" type="password" placeholder="Enter your password" required />
+  <span class="toggle-eye" data-target="loginPassword">👁️</span>
+</div>
+
+
+          <button class="btn btn-primary" type="submit">Sign in</button>
+
+          <!-- pesan error / info -->
+          <div id="msg" style="margin-top:10px;color:#ffb4b4;font-size:13px;"></div>
+
+          <!-- cuma 1 sign up (yang bawah) -->
+          <div class="login-footer">
+            Don’t have an account? <a href="./signup.html"><b>Sign up</b></a>
+          </div>
+        </form>
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="login-right">
+        <div class="testimonial">
+          <h2>Hear from our<br/>happy users</h2>
+
+          <div class="quote">
+            “The plant list feature is comprehensive. Information on sensor conditions and plant health status makes me more aware of plant care”
+            <b>Camila Martinez</b>
+          </div>
+
+          <div class="mini-card">
+            <div class="avatars">
+              <span></span><span></span><span></span>
+            </div>
+            <h4>Smart, Simple Plant Care</h4>
+            <p>Monitor plants with real-time data and smart automation. GreenPulse keeps them healthy—grow smarter!</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    const form = document.getElementById("loginForm");
+    const msg = document.getElementById("msg");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const email = form.querySelector("input[type='email']").value.trim();
+      const password = form.querySelector("input[type='password']").value;
+
+      const res = window.GPAuth.signIn({ email, password });
+      if (!res.ok) {
+        msg.textContent = res.message;
+        return;
+      }
+
+      window.location.href = "./dashboard.html";
+    });
+  </script>
+  <script>
+  document.querySelectorAll(".toggle-eye").forEach((eye) => {
+    eye.addEventListener("click", () => {
+      const target = document.getElementById(eye.dataset.target);
+      target.type = target.type === "password" ? "text" : "password";
+    });
+  });
+</script>
+
+</body>
+</html>

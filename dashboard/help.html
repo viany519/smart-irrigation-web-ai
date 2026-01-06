@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Greenpulse • Help</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .page-title { font-size:44px; margin:0; line-height:1.1; }
+      .page-sub { margin:6px 0 0; color:#6b7280; }
+
+      .grid { display:grid; grid-template-columns: 1.2fr 1fr; gap:18px; margin-top:14px; }
+      .card { background:rgba(255,255,255,.72); border:1px solid rgba(0,0,0,.08); border-radius:22px; box-shadow:0 16px 40px rgba(0,0,0,.06); overflow:hidden; }
+      .card.pad { padding:18px; }
+      .muted { color:#6b7280; font-size:13px; }
+
+      details { border:1px solid rgba(0,0,0,.08); border-radius:18px; background:rgba(255,255,255,.75); padding:12px 14px; }
+      details + details { margin-top:10px; }
+      summary { cursor:pointer; font-weight:800; }
+      .ans { margin-top:10px; color:#374151; line-height:1.6; }
+
+      ul { margin:10px 0 0 18px; color:#374151; }
+      code { background:rgba(0,0,0,.06); padding:2px 6px; border-radius:8px; }
+
+      @media (max-width: 980px) {
+        .grid { grid-template-columns: 1fr; }
+        .page-title { font-size:36px; }
+      }
+    </style>
+  </head>
+
+  <body class="bg-grid-light" data-page="help">
+    <div class="shell">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+  <div class="brand">
+    <img src="./assets/logo.svg" alt="logo" />
+    greenpulse
+  </div>
+
+  <div class="nav-title">MENU</div>
+  <nav class="nav">
+    <a href="./dashboard.html"><img class="icon" src="./assets/icons/dashboard.svg" />Dashboard</a>
+    <a href="./monitoring.html"><img class="icon" src="./assets/icons/monitoring.svg" />Monitoring</a>
+    <a href="./control.html"><img class="icon" src="./assets/icons/control.svg" />Control</a>
+    <a href="./history.html"><img class="icon" src="./assets/icons/history.svg" />History</a>
+    <a href="./settings.html"><img class="icon" src="./assets/icons/settings.svg" />Settings</a>
+  </nav>
+
+  <div class="nav-title">GENERAL</div>
+  <nav class="nav">
+    <a href="./profile.html"><img class="icon" src="./assets/icons/profile.svg" />Profile</a>
+    <a href="./help.html" class="active"><img class="icon" src="./assets/icons/help.svg" />Help</a>
+    <a href="#" data-logout>
+        <img class="icon" src="./assets/icons/logout.svg" />
+        Logout
+    </a>
+
+  </nav>
+</aside>
+
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+          <h1 class="page-title">Help</h1>
+          <p class="page-sub">
+            Panduan singkat penggunaan Greenpulse dan penjelasan konsep untuk kebutuhan presentasi.
+          </p>
+
+          <div class="grid">
+            <!-- QUICK GUIDE -->
+            <div class="card pad">
+              <h3 style="margin:0 0 10px; font-size:18px">Quick Guide</h3>
+              <ol style="margin:0; padding-left:18px; color:#374151; line-height:1.7">
+                <li><b>Pick plant</b>: pilih tanaman yang ingin kamu pantau.</li>
+                <li><b>Monitoring</b>: melihat kondisi terakhir dan status keputusan penyiraman.</li>
+                <li><b>Control</b>: memasukkan data sensor secara manual (moisture, temperature, humidity).</li>
+                <li><b>History</b>: meninjau grafik dan tabel riwayat input serta hasil prediksi AI.</li>
+                <li><b>Settings</b>: menyesuaikan ambang batas agar keputusan sesuai karakter sensor.</li>
+              </ol>
+
+              <div style="height:12px"></div>
+              <div class="muted">
+                Mode ini cocok untuk simulasi tanpa Arduino. Data diinput manual,
+                lalu sistem memproses dan menyimpan hasilnya.
+              </div>
+            </div>
+
+            <!-- DIFFERENCE -->
+            <div class="card pad">
+              <h3 style="margin:0 0 10px; font-size:18px">What makes this different?</h3>
+              <div class="muted">
+                Greenpulse tidak hanya menampilkan angka sensor,
+                tetapi juga menyediakan logika keputusan yang transparan dan dapat dijelaskan.
+              </div>
+
+              <div style="height:12px"></div>
+              <ul>
+                <li><b>Explainable</b>: aturan keputusan sederhana dan mudah dipahami.</li>
+                <li><b>Traceable</b>: setiap input dan hasil tercatat di History.</li>
+                <li><b>Simulation-ready</b>: dapat digunakan tanpa perangkat fisik.</li>
+              </ul>
+            </div>
+
+            <!-- FAQ -->
+            <div class="card pad" style="grid-column:1 / -1">
+              <h3 style="margin:0 0 10px; font-size:18px">FAQ</h3>
+
+              <details open>
+                <summary>Kenapa hasil prediksi terlihat sangat konsisten?</summary>
+                <div class="ans">
+                  Karena keputusan penyiraman sangat dipengaruhi oleh nilai kelembapan tanah.
+                  Sistem ini mengikuti pola data yang dimasukkan, sehingga hasilnya stabil
+                  selama input berada pada rentang yang sama.
+                </div>
+              </details>
+
+              <details>
+                <summary>Apakah sistem ini harus terhubung dengan Arduino?</summary>
+                <div class="ans">
+                  Tidak. Versi ini dirancang untuk simulasi.
+                  Nilai sensor diperoleh dari alat pengguna sendiri,
+                  lalu dimasukkan secara manual ke dalam sistem.
+                </div>
+              </details>
+
+              <details>
+                <summary>Di mana data disimpan?</summary>
+                <div class="ans">
+                  Data disimpan di browser menggunakan <code>localStorage</code>.
+                  Mekanisme ini mudah diganti dengan API atau database
+                  jika sistem dikembangkan lebih lanjut.
+                </div>
+              </details>
+
+              <details>
+                <summary>Bagaimana cara menjelaskan sistem ini saat presentasi?</summary>
+                <div class="ans">
+                  Jelaskan alurnya:
+                  <ul>
+                    <li>Pengguna menginput data sensor</li>
+                    <li>Sistem menghitung kebutuhan air</li>
+                    <li>Hasil ditampilkan dan disimpan</li>
+                    <li>Riwayat dapat dianalisis melalui grafik</li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+    <script>
+async function loadHistoryFromAPI() {
+  try {
+    const plant = getCurrentPlant(getSession());
+    if (!plant) {
+      state.log = [];
+      return;
+    }
+
+    const res = await fetch(
+      `http://127.0.0.1:8000/history?plant_id=${plant.id}`
+    );
+
+    if (!res.ok) {
+      console.error("Gagal ambil history");
+      state.log = [];
+      return;
+    }
+
+    const data = await res.json();
+
+    // data HARUS array
+    state.log = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Error loadHistoryFromAPI:", err);
+    state.log = [];
+  }
+}
+</script>
+<script>
+
+   document.addEventListener("DOMContentLoaded", async () => {
+  const session = getSession();
+  const state = {
+    plant: getCurrentPlant(session),
+    metric: "moisture",
+    log: []
+  };
+
+  await loadHistoryFromAPI();
+
+  renderSummary(state.plant, state.log);
+  renderChart(state.metric, state.log);
+  renderTable(state.metric, state.log);
+});
+
+    </script>
+  </body>
+</html>

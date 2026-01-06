@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Sign Up</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="bg-grid-dark">
+  <div class="shell">
+    <div class="app login-app" style="min-height: calc(100vh - 44px);">
+      <section class="login-left">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <form class="login-form" id="signupForm">
+          <div class="field">
+            <input class="input" type="text" placeholder="Enter your name" required />
+          </div>
+          <div class="field">
+            <input class="input" type="email" placeholder="Enter your email" required />
+          </div>
+         <div class="field password-field">
+  <input class="input" id="password" type="password" placeholder="Create a password" required />
+  <span class="toggle-eye" data-target="password">👁️</span>
+</div>
+
+<div class="field password-field">
+  <input class="input" id="confirmPassword" type="password" placeholder="Confirm password" required />
+  <span class="toggle-eye" data-target="confirmPassword">👁️</span>
+</div>
+
+
+          <button class="btn btn-primary" type="submit">Create account</button>
+
+          <div id="msg" style="margin-top:10px;color:#ffb4b4;font-size:13px;"></div>
+
+          <div class="login-footer">
+            Already have an account? <a href="./login.html"><b>Sign in</b></a>
+          </div>
+        </form>
+      </section>
+
+      <aside class="login-right">
+        <div class="testimonial">
+          <h2>Join Greenpulse<br/>today</h2>
+          <div class="quote">
+            “Create an account to monitor your plant with real-time data and smart automation.”
+            <b>Greenpulse Team</b>
+          </div>
+          <div class="mini-card">
+            <h4>Smart, Simple Plant Care</h4>
+            <p>Sign up first, then sign in. Your profile will appear on the dashboard.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+ <script>
+  const form = document.getElementById("signupForm");
+  const msg = document.getElementById("msg");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = form.querySelector("input[type='text']").value.trim();
+    const email = form.querySelector("input[type='email']").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      msg.textContent = "Password confirmation does not match.";
+      return;
+    }
+
+    const res = window.GPAuth.signUp({ name, email, password });
+    if (!res.ok) {
+      msg.textContent = res.message;
+      return;
+    }
+
+    window.location.href = "./login.html";
+  });
+
+  // toggle eye
+  document.querySelectorAll(".toggle-eye").forEach((eye) => {
+    eye.addEventListener("click", () => {
+      const target = document.getElementById(eye.dataset.target);
+      target.type = target.type === "password" ? "text" : "password";
+    });
+  });
+</script>
+
+</body>
+</html>

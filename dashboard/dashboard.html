@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body class="bg-grid-light" data-page="dashboard">
+
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html" class="active">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+
+          <a data-nav href="./monitoring.html">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+        </nav>
+
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a data-nav href="./profile.html">
+            <img class="icon" src="./assets/icons/profile.svg" alt="" />
+            Profile
+          </a>
+
+          <a data-nav href="./help.html">
+            <img class="icon" src="./assets/icons/help.svg" alt="" />
+            Help
+          </a>
+
+          <a href="#" data-logout>
+            <img class="icon" src="./assets/icons/logout.svg" alt="" />
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" alt="avatar" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+          <!-- Header -->
+          <div class="row" style="justify-content: space-between; align-items: center;">
+            <div>
+              <h1 class="h1">Dashboard</h1>
+              <p class="sub">Welcome to Greenpulse! Monitor your plant’s condition in real-time</p>
+            </div>
+
+            <div class="row" style="gap:12px;">
+              <a class="btn btn-outline btn-eq"
+              href="./pickplant.html"
+              data-action="pick-plant">
+              + Pick plant
+            </a>
+
+              <a class="btn btn-primary btn-eq"
+              href="./addplant.html"
+              data-action="add-plant">
+              + Add plant
+            </a>
+
+            </div>
+          </div>
+
+          <div style="height:18px;"></div>
+
+          <!-- GRID -->
+          <div class="grid-2">
+
+            <!-- EMPTY STATE (muncul kalau belum ada plant) -->
+            <div class="card big" id="emptyPlant">
+              <h2 style="margin:0;">No plant yet</h2>
+              <p class="muted" style="margin-top:8px;">
+                Kamu belum menambahkan tanaman. Klik <b>Add plant</b> untuk mulai monitoring.
+              </p>
+
+              <div style="height:14px;"></div>
+
+              <a class="btn btn-primary btn-eq" href="./addplant.html">+ Add plant</a>
+            </div>
+
+            <!-- PLANT CARD (muncul kalau plant sudah ada) -->
+            <div class="card big" id="plantCard" hidden>
+
+              <div class="row" style="gap:22px; align-items: center;">
+                <!-- foto tanaman: ini masih statis dulu, nanti bisa diganti per plant -->
+                <img
+                data-plant-photo
+                src="./assets/basil.png"
+                alt="Plant"
+                style="width:160px; height:160px; object-fit:contain;"
+                />
+
+
+                <div class="col" style="gap:10px;">
+                  <h2 data-plant-title style="margin:0;">Plant (Species)</h2>
+
+                  <div class="muted">
+                    Planted on <b data-plant-planted>-</b>
+                  </div>
+
+                  <div class="muted">
+                    Grow status <b data-plant-status>Healthy — Growing steadily</b>
+                  </div>
+
+                  <div class="box-outline">
+                    <b>Description</b>
+                    <p class="muted" data-plant-desc style="margin-top:6px;"></p>
+                  </div>
+
+                </div>
+              </div>
+
+              <div style="height:16px;"></div>
+
+              <div class="box">
+                <b>Monitoring</b>
+
+                <div class="grid-mini">
+                  <div>
+                    <div class="muted">Soil moisture now</div>
+                    <div class="value" data-moist>—</div>
+                  </div>
+                  <div>
+                    <div class="muted">Soil temperature now</div>
+                    <div class="value" data-temp>—</div>
+                  </div>
+                  
+                  <div>
+                    <div class="muted">Humidity now</div>
+                    <div class="value" data-hum>—</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col" style="gap:14px;">
+
+              <div class="card">
+                <b>Reminders</b>
+                <div class="alert" style="margin-top:10px;">
+                 <span data-reminder-icon>⚠️</span>
+
+                  <div>
+                    <div style="font-weight:800;" data-status>The soil is too dry</div>
+                    <div class="muted" style="margin-top:6px;">Plant: <b data-reminder-plant>—</b></div>
+                    <div class="muted">Description: <span data-reminder-desc>—</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <b>Time</b>
+                <div class="clock" data-clock style="margin-top:12px;">00 : 00 : 00</div>
+              </div>
+
+              <!-- Pump Status tinggal 1 (yang ini aja) -->
+              <div class="card" id="aiCard">
+                <b>AI Watering Recommendation</b>
+                <div class="muted" style="margin-top:6px;">Hasil prediksi berdasarkan input sensor terakhir.</div>
+
+                <div style="display:flex; align-items:center; gap:12px; margin-top:12px;">
+                  <div data-ai-badge
+                       style="padding:8px 14px; border-radius:999px; font-weight:700;
+                              border:1px solid rgba(13,110,86,.25);
+                              background:rgba(13,110,86,.06); color:#0d6e56;">
+                    —
+                  </div>
+                  <div class="muted" data-ai-proba style="font-size:12px;"></div>
+                </div>
+
+                <div class="muted" data-ai-reason style="margin-top:10px; line-height:1.35;"></div>
+                <div class="muted" data-ai-updated style="margin-top:8px; font-size:12px;"></div>
+
+                <a class="btn btn-outline" href="./monitoring.html"
+   style="margin-top:12px; display:inline-flex; border-radius:999px; padding:10px 16px;">
+  Input data
+</a>
+
+              </div>
+
+            </div>
+
+          </div>
+          <!-- /GRID -->
+
+        </div>
+      </div>
+      <!-- /MAIN -->
+
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    function safePhotoSrc(photo) {
+      if (typeof photo !== "string") return "./assets/avatar-default.png";
+      const s = photo.trim();
+      if (!s || s === "null" || s === "undefined") return "./assets/avatar-default.png";
+
+      // blok path lokal (ga bisa dipakai di browser)
+      if (s.includes("fakepath") || /^[a-zA-Z]:\\/.test(s)) return "./assets/avatar-default.png";
+
+      // izinkan base64 (hasil FileReader)
+      if (s.startsWith("data:image/")) return s;
+
+      // izinkan relative path
+      if (s.startsWith("./") || s.startsWith("assets/")) return s;
+
+      return "./assets/avatar-default.png";
+    }
+
+    function renderTopbar(session) {
+      const prof = getProfile(session.email);
+
+      const elPhoto = document.querySelector("[data-user-photo]");
+      const elName  = document.querySelector("[data-user-name]");
+      const elEmail = document.querySelector("[data-user-email]");
+
+      if (elPhoto) elPhoto.src = safePhotoSrc(prof.photo);
+      if (elName)  elName.textContent = prof.name || session.name || "User";
+      if (elEmail) elEmail.textContent = session.email;
+    }
+  
+
+// ===== AI card (temporary local rule; replace with real model/API later) =====
+function gp_getPlantKey(plant) {
+  if (!plant) return "selected";
+  return (plant.id ?? plant.plantId ?? plant.key ?? plant.name ?? "selected").toString();
+}
+
+function gp_safeNumber(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function gp_getTelemetry(email, plantKey) {
+  // Try per-user+plant first, then per-plant, then global last sensor.
+  const keys = [
+    `gp:telemetry:${email}:${plantKey}`,
+    `gp:telemetry:${plantKey}`,
+    `gp:telemetry:last`
+  ];
+  for (const k of keys) {
+    const raw = localStorage.getItem(k);
+    if (!raw) continue;
+    try { return JSON.parse(raw); } catch (_) {}
+  }
+  return null;
+}
+
+// Local baseline rule (derived from dataset: Pump ON mostly triggered by low soil moisture)
+function gp_predictLocal({ soilMoisture }) {
+  const TH = 35; // persen
+  const m = Number(soilMoisture);
+  if (!Number.isFinite(m)) return { ok: false };
+
+  return {
+    ok: true,
+    needWater: m < TH,
+    threshold: TH
+  };
+}
+
+
+function gp_updateAiCard() {
+  const badge = document.querySelector("[data-ai-badge]");
+  const proba = document.querySelector("[data-ai-proba]");
+  const reason = document.querySelector("[data-ai-reason]");
+  const updated = document.querySelector("[data-ai-updated]");
+  if (!badge || !proba || !reason || !updated) return;
+
+  // Get session & selected plant (if app.js provides these)
+ const session = JSON.parse(localStorage.getItem("gp_session") || "null");
+const email = session?.email;
+if (!email) return;
+
+
+
+ const plants = JSON.parse(localStorage.getItem(`gp_plants_${email}`) || "[]");
+
+ 
+const activeId = localStorage.getItem(`gp_active_plant_${email}`);
+const plant = plants.find(p => String(p.id) === String(activeId));
+
+  const plantKey = gp_getPlantKey(plant);
+
+  // Prefer telemetry saved from Control page; fallback to plant object fields if exist
+  const tele = gp_getTelemetry(email, plantKey) || {};
+  const soilMoisture =
+    tele.soilMoisture ?? tele["Soil Moisture"] ?? tele.moisture ?? tele.moist ??
+    plant?.soilMoisture ?? plant?.soil_moisture ?? plant?.moisture ?? plant?.moist ?? null;
+
+  const pred = gp_predictLocal({ soilMoisture });
+
+  if (!pred.ok) {
+    badge.textContent = "No data";
+    badge.style.borderColor = "rgba(0,0,0,.18)";
+    badge.style.background = "rgba(0,0,0,.04)";
+    badge.style.color = "rgba(0,0,0,.65)";
+    proba.textContent = "";
+    reason.textContent = "Belum ada input sensor untuk tanaman ini. Isi dulu di menu Control (simulasi Arduino), lalu kembali ke Dashboard.";
+    updated.textContent = "";
+    return;
+  }
+
+ // badge SELALU tampil
+badge.style.display = "inline-block";
+
+if (pred.needWater) {
+  // 🔴 NEEDS WATER
+  badge.textContent = "Needs watering";
+  badge.style.borderColor = "rgba(220,53,69,.25)";
+  badge.style.background = "rgba(220,53,69,.08)";
+  badge.style.color = "#b02a37";
+
+  reason.textContent =
+    `Kondisi tanaman memerlukan air! Disarankan penyiraman.`;
+} else {
+  // 🟢 HEALTHY
+  badge.textContent = "Healthy";
+  badge.style.borderColor = "rgba(13,110,86,.25)";
+  badge.style.background = "rgba(13,110,86,.06)";
+  badge.style.color = "#0d6e56";
+
+  reason.textContent =
+    `Kondisi tanaman baik, tidak memerlukan penyiraman`;
+}
+
+
+  proba.textContent = `Confidence (UI): ${(pred.pNeed * 100).toFixed(0)}% need water`;
+  const ts = tele.ts || tele.timestamp || null;
+  updated.textContent = ts ? `Last sensor update: ${new Date(ts).toLocaleString()}` : "";
+
+  // ===== REMINDER SYNC =====
+const lastAI = JSON.parse(localStorage.getItem("gp:telemetry:last") || "null");
+
+if (lastAI) {
+  const dry = lastAI.soilMoisture < 35;
+
+  document.querySelector("[data-status]").textContent =
+    dry ? "The soil is too dry" : "Condition is good";
+
+// === AMBIL PLANT DARI SISTEM UTAMA (app.js) ===
+let plant = null;
+
+if (typeof getSelectedPlant === "function") {
+  plant = getSelectedPlant();
+}
+
+if (!plant && window.GPPlants?.getActivePlant) {
+  plant = window.GPPlants.getActivePlant();
+}
+
+
+document.querySelector("[data-reminder-plant]").textContent =
+  plant?.name || "—";
+
+
+
+
+  document.querySelector("[data-reminder-desc]").textContent =
+    dry
+      ? "AI mendeteksi kelembapan tanah rendah"
+      : "Tanaman dalam kondisi aman";
+
+      const icon = document.querySelector("[data-reminder-icon]");
+if (icon) {
+  icon.style.display = dry ? "inline-block" : "none";
+}
+
+}
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Delay a tick so other renderers (plant info) can finish first.
+  setTimeout(gp_updateAiCard, 0);
+});
+
+// Auto-refresh when Control page saves to localStorage
+window.addEventListener("storage", (e) => {
+  if (e && e.key && e.key.startsWith("gp:telemetry")) gp_updateAiCard();
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const pickBtn = document.querySelector('[data-action="pick-plant"]');
+  if (pickBtn) {
+    pickBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "./pickplant.html";
+    });
+  }
+
+  const addBtn = document.querySelector('[data-action="add-plant"]');
+  if (addBtn) {
+    addBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "./addplant.html";
+    });
+  }
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ambil session
+  const session = JSON.parse(localStorage.getItem("gp_session") || "null");
+  if (!session?.email) return;
+
+  const email = session.email;
+
+  // ambil plant & active plant
+  const plants = JSON.parse(localStorage.getItem(`gp_plants_${email}`) || "[]");
+  const activeId = localStorage.getItem(`gp_active_plant_${email}`);
+
+  const empty = document.getElementById("emptyPlant");
+  const card  = document.getElementById("plantCard");
+
+  if (!plants.length || !activeId) {
+    empty.style.display = "block";
+    card.hidden = true;
+    return;
+  }
+
+  const plant = plants.find(p => String(p.id) === String(activeId));
+  if (!plant) {
+    empty.style.display = "block";
+    card.hidden = true;
+    return;
+  }
+
+  // tampilkan plant card
+  empty.style.display = "none";
+  card.hidden = false;
+
+  // isi data plant
+  document.querySelector("[data-plant-title]").textContent =
+    plant.name + (plant.species ? ` (${plant.species})` : "");
+
+  document.querySelector("[data-plant-planted]").textContent =
+    plant.plantedOn || "-";
+
+  document.querySelector("[data-plant-status]").textContent =
+    plant.growth || "—";
+
+  document.querySelector("[data-plant-desc]").textContent =
+    plant.description || "-";
+
+  const img = document.querySelector("[data-plant-photo]");
+  if (plant.photo) img.src = plant.photo;
+});
+</script>
+
+
+</body>
+</html>

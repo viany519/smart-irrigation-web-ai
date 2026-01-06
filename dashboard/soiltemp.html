@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Soil Temperature</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    /* Scoped tweaks biar mirip figma (tanpa ngerusak styles.css utama) */
+    .chart-page .page-head{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+      margin-bottom:14px;
+    }
+    .chart-page .page-head h1{ margin:0; font-size:32px; letter-spacing:-0.4px; }
+    .chart-page .page-head .right-plant{
+      font-weight:700; opacity:.85;
+    }
+
+    .chart-card{
+      border-radius:22px;
+      padding:18px 18px 16px;
+    }
+    .chart-title{
+      font-weight:800;
+      font-size:14px;
+      margin:0 0 10px;
+      color:#0f5a44;
+    }
+
+    .chart-surface{
+      border-radius:18px;
+      padding:16px 14px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.70)),
+        repeating-linear-gradient(0deg, rgba(0,0,0,.045) 0, rgba(0,0,0,.045) 1px, transparent 1px, transparent 26px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.045) 0, rgba(0,0,0,.045) 1px, transparent 1px, transparent 26px);
+    }
+
+    .chart-wrap{ width:100%; overflow:hidden; }
+    svg{ width:100%; height:auto; display:block; }
+
+    .tbl-wrap{
+      margin-top:14px;
+      border-radius:18px;
+      overflow:hidden;
+      background:rgba(255,255,255,.72);
+    }
+    table{ width:100%; border-collapse:collapse; }
+    thead th{
+      text-align:left;
+      padding:12px 14px;
+      font-size:12px;
+      color:#fff;
+      background:#0f5a44;
+      font-weight:800;
+    }
+    tbody td{
+      padding:12px 14px;
+      font-size:12px;
+      border-top:1px solid rgba(0,0,0,.06);
+      color:rgba(0,0,0,.72);
+    }
+    .chg-pos{ color:#0f5a44; font-weight:700; }
+    .chg-neg{ color:#b42318; font-weight:700; }
+    .muted2{ opacity:.75; }
+
+    /* biar clickable icon-btn bisa jadi <a> juga */
+    a.icon-btn{ text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:center; }
+  </style>
+</head>
+
+<body class="bg-grid-light chart-page" data-page="monitoring">
+
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+
+          <a data-nav href="./monitoring.html" class="active">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+        </nav>
+
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a data-nav href="./profile.html">
+            <img class="icon" src="./assets/icons/profile.svg" alt="" />
+            Profile
+          </a>
+
+          <a data-nav href="./help.html">
+            <img class="icon" src="./assets/icons/help.svg" alt="" />
+            Help
+          </a>
+
+          <a href="#" data-logout>
+            <img class="icon" src="./assets/icons/logout.svg" alt="" />
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+       <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" alt="avatar" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+          <div class="page-head">
+            <div>
+              <h1>Soil Temperature</h1>
+            </div>
+            <div class="right-plant" data-plant-short>—</div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="chart-surface">
+              <div class="chart-title">Soil Temperature Chart</div>
+
+              <div class="chart-wrap">
+                <svg id="tempChart" viewBox="0 0 1000 360" role="img" aria-label="Soil Temperature Chart">
+                  <!-- grid lines (halus) -->
+                  <g opacity="0.18" stroke="#0f5a44" stroke-width="1">
+                    <line x1="0" y1="60" x2="1000" y2="60"></line>
+                    <line x1="0" y1="140" x2="1000" y2="140"></line>
+                    <line x1="0" y1="220" x2="1000" y2="220"></line>
+                    <line x1="0" y1="300" x2="1000" y2="300"></line>
+                  </g>
+
+                  <!-- area + line -->
+                  <path id="tempArea" fill="rgba(15,90,68,0.18)"></path>
+                  <path id="tempLine" fill="none" stroke="#0f5a44" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:24%;">Time</th>
+                    <th style="width:20%;">Soil Temperature (°C)</th>
+                    <th style="width:14%;">Change</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="tempRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- /MAIN -->
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    // ====== storage helpers (buat chart + tabel) ======
+    function getSelectedPlantSafe(){
+      if (typeof getSelectedPlant === "function") return getSelectedPlant();
+      // fallback super aman
+      try { return JSON.parse(localStorage.getItem("gp_selected_plant")||"null"); } catch { return null; }
+    }
+    function getLogsForPlant(plantId){
+      let all = {};
+      try { all = JSON.parse(localStorage.getItem("gp_sensor_logs")||"{}"); } catch {}
+      return Array.isArray(all[plantId]) ? all[plantId] : [];
+    }
+    function saveLogsForPlant(plantId, logs){
+      let all = {};
+      try { all = JSON.parse(localStorage.getItem("gp_sensor_logs")||"{}"); } catch {}
+      all[plantId] = logs;
+      localStorage.setItem("gp_sensor_logs", JSON.stringify(all));
+    }
+    function seedDemoIfEmpty(plant){
+      if (!plant) return;
+      const pid = plant.id || plant.plantId || plant.email || "default";
+      const logs = getLogsForPlant(pid);
+      if (logs.length) return;
+
+      const base = Date.now() - (2 * 60 * 60 * 1000);
+      const demo = [
+        { ts: base + 0*60*60*1000, soil_temp: 22, note: "Initial soil temperature" },
+        { ts: base + 1*60*60*1000, soil_temp: 22, note: "Soil temperature stable" },
+        { ts: base + 2*60*60*1000, soil_temp: 23, note: "Slight increase due to sunlight" },
+      ];
+      saveLogsForPlant(pid, demo);
+    }
+    function fmtTime(ts){
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${y}-${m}-${day} ${hh}:${mm}`;
+    }
+
+    // Smooth line: Catmull-Rom -> Bezier
+    function smoothPath(points){
+      if (points.length < 2) return "";
+      let d = `M ${points[0].x} ${points[0].y}`;
+      for (let i=0; i<points.length-1; i++){
+        const p0 = points[i-1] || points[i];
+        const p1 = points[i];
+        const p2 = points[i+1];
+        const p3 = points[i+2] || p2;
+
+        const c1x = p1.x + (p2.x - p0.x) / 6;
+        const c1y = p1.y + (p2.y - p0.y) / 6;
+        const c2x = p2.x - (p3.x - p1.x) / 6;
+        const c2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
+      }
+      return d;
+    }
+
+    function renderTempChartAndTable(){
+      const plant = getSelectedPlantSafe();
+      const plantName = plant ? (plant.name || "Plant") : "Plant";
+      const short = document.querySelector("[data-plant-short]");
+      if (short) short.textContent = plantName;
+
+      if (!plant) return;
+
+      const pid = plant.id || plant.plantId || plant.email || "default";
+      seedDemoIfEmpty(plant);
+
+      const logs = getLogsForPlant(pid).slice().sort((a,b)=>a.ts-b.ts);
+      const values = logs.map(x => Number(x.soil_temp ?? x.temp ?? x.soil_temp_value ?? 0));
+
+      // ===== table =====
+      const tbody = document.getElementById("tempRows");
+      if (tbody){
+        tbody.innerHTML = "";
+        logs.forEach((row, idx) => {
+          const v = Number(row.soil_temp ?? row.temp ?? row.soil_temp_value ?? 0);
+          const prev = idx>0 ? Number(logs[idx-1].soil_temp ?? logs[idx-1].temp ?? logs[idx-1].soil_temp_value ?? 0) : null;
+          const diff = prev===null ? null : (v - prev);
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="muted2">${fmtTime(row.ts)}</td>
+            <td>${v ? `${v}°C` : "—"}</td>
+            <td>${diff===null ? "—" : `<span class="${diff>=0 ? "chg-pos":"chg-neg"}">${diff>=0?"+":""}${diff}°C</span>`}</td>
+            <td class="muted2">${row.note || row.notes || "—"}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // ===== chart =====
+      const svgW = 1000, svgH = 360;
+      const padX = 70, padY = 40;
+      const baseY = svgH - padY;
+
+      const minV = Math.min(...values);
+      const maxV = Math.max(...values);
+      const span = Math.max(1, (maxV - minV));
+      const lo = minV - span*0.25;
+      const hi = maxV + span*0.25;
+
+      const n = Math.max(2, values.length);
+      const stepX = (svgW - padX*2) / (n-1);
+
+      const pts = values.map((v, i) => {
+        const x = padX + i*stepX;
+        const t = (v - lo) / (hi - lo);
+        const y = baseY - t * (baseY - padY);
+        return { x, y };
+      });
+
+      const line = smoothPath(pts);
+      const area = line
+        + ` L ${pts[pts.length-1].x} ${baseY}`
+        + ` L ${pts[0].x} ${baseY} Z`;
+
+      const pLine = document.getElementById("tempLine");
+      const pArea = document.getElementById("tempArea");
+      if (pLine) pLine.setAttribute("d", line);
+      if (pArea) pArea.setAttribute("d", area);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // kalau lu pakai auth, ini ngikut sistem lu yang udah ada
+      const session = (typeof requireAuth === "function") ? requireAuth() : null;
+      if (session && typeof renderTopbar === "function") renderTopbar(session);
+      if (typeof setupLogout === "function") setupLogout();
+
+      renderTempChartAndTable();
+    });
+  </script>
+</body>
+</html>

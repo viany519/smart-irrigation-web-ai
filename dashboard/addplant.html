@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Add Plant</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body class="bg-grid-light">
+  <div class="shell">
+    <div class="app paper">
+
+      <!-- SIDEBAR (sama kayak dashboard) -->
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="./assets/logo.svg" alt="greenpulse logo" />
+          greenpulse
+        </div>
+
+        <div class="nav-title">MENU</div>
+        <nav class="nav">
+          <a data-nav href="./dashboard.html">
+            <img class="icon" src="./assets/icons/dashboard.svg" alt="" />
+            Dashboard
+          </a>
+
+          <a data-nav href="./monitoring.html">
+            <img class="icon" src="./assets/icons/monitoring.svg" alt="" />
+            Monitoring
+          </a>
+
+          <a data-nav href="./control.html">
+            <img class="icon" src="./assets/icons/control.svg" alt="" />
+            Control
+          </a>
+
+          <a data-nav href="./history.html">
+            <img class="icon" src="./assets/icons/history.svg" alt="" />
+            History
+          </a>
+
+          <a data-nav href="./settings.html">
+            <img class="icon" src="./assets/icons/settings.svg" alt="" />
+            Settings
+          </a>
+        </nav>
+
+        <div class="nav-title">GENERAL</div>
+        <nav class="nav">
+          <a data-nav href="./profile.html">
+            <img class="icon" src="./assets/icons/profile.svg" alt="" />
+            Profile
+          </a>
+
+          <a data-nav href="./help.html">
+            <img class="icon" src="./assets/icons/help.svg" alt="" />
+            Help
+          </a>
+
+          <a href="#" data-logout>
+            <img class="icon" src="./assets/icons/logout.svg" alt="" />
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+         <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+
+          <div class="profile">
+            <img data-user-photo src="./assets/avatar-default.png" alt="avatar" />
+            <div>
+              <div class="name" data-user-name>User</div>
+              <div class="email" data-user-email>user@email.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+          <div class="row" style="justify-content:space-between;align-items:center;">
+            <div>
+              <h1 class="h1">Add Plant</h1>
+              <p class="sub">Masukkan data tanaman agar dashboard bisa menampilkan monitoring.</p>
+            </div>
+
+            <div class="row" style="gap:12px;">
+              <a class="btn btn-outline btn-eq" href="./dashboard.html">Back</a>
+            </div>
+          </div>
+
+          <div style="height:18px;"></div>
+
+          <div class="card big">
+            <form id="plantForm">
+
+              <div class="row" style="gap:18px; align-items:flex-start; flex-wrap:wrap;">
+                <!-- PHOTO -->
+                <div class="box" style="min-width:260px;">
+                  <b>Plant photo</b>
+                  <div style="height:10px;"></div>
+
+                  <div class="row" style="gap:14px; align-items:center;">
+                    <img id="preview"
+                      src="./assets/basil.png"
+                      alt="preview"
+                      style="width:90px;height:90px;object-fit:cover;border-radius:16px;"
+                    />
+
+                    <div class="col" style="gap:10px;">
+                      <input id="photo" type="file" accept="image/*" />
+                      <div class="muted" style="font-size:12px;">(opsional) untuk tampil di dashboard</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FIELDS -->
+                <div class="col" style="flex:1; min-width:320px; gap:12px;">
+                  <div class="row" style="gap:12px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:240px;">
+                      <div class="muted" style="margin-bottom:6px;">Plant name</div>
+                      <input class="input" id="name" required placeholder="e.g., Basil" />
+                    </div>
+
+                    <div style="flex:1; min-width:240px;">
+                      <div class="muted" style="margin-bottom:6px;">Scientific name</div>
+                      <input class="input" id="species" placeholder="e.g., Ocimum basilicum" />
+                    </div>
+                  </div>
+
+                  <div class="row" style="gap:12px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:240px;">
+                      <div class="muted" style="margin-bottom:6px;">Planted on</div>
+                      <input class="input" id="plantedOn" type="date" />
+                    </div>
+
+                    <div style="flex:1; min-width:240px;">
+                      <div class="muted" style="margin-bottom:6px;">Growth status</div>
+                      <input class="input" id="growth" placeholder="Healthy — Growing steadily" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="muted" style="margin-bottom:6px;">Description</div>
+                    <textarea class="input" id="description" rows="4" placeholder="Describe your plant..."></textarea>
+                  </div>
+
+                  <div class="row" style="gap:12px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:240px;">
+                      <div class="muted" style="margin-bottom:6px;">Min soil moisture (%)</div>
+                      <input class="input" id="minMoisture" type="number" min="0" max="100" value="30" />
+                    </div>
+
+                    <div style="flex:1; min-width:240px;">
+                      <div class="muted" style="margin-bottom:6px;">Notes (optional)</div>
+                      <input class="input" id="notes" placeholder="Any notes..." />
+                    </div>
+                  </div>
+
+                  <div class="row" style="justify-content:flex-end; gap:12px; margin-top:10px;">
+                    <a class="btn btn-outline btn-eq" href="./dashboard.html">Cancel</a>
+                    <button class="btn btn-primary btn-eq" type="submit">Save plant</button>
+                </div>
+
+
+            <div id="msg" class="muted" style="margin-top:10px;"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+  const form = document.getElementById("plantForm");
+  const photoInput = document.getElementById("photo");
+  const msg = document.getElementById("msg");
+
+  function fileToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const user = window.GPData?.getCurrentUser?.();
+    if (!user) {
+      // kalau ini kejadian, biasanya kamu buka file bukan lewat Live Server
+      window.location.href = "./login.html";
+      return;
+    }
+
+    let photo = "";
+    const f = photoInput?.files?.[0];
+    if (f) photo = await fileToDataURL(f);
+
+    const plant = window.GPData.addPlant({
+      name: document.getElementById("name").value.trim(),
+      species: document.getElementById("species").value.trim(),
+      plantedOn: document.getElementById("plantedOn").value || "-",
+      description: document.getElementById("description").value.trim(),
+      growth: document.getElementById("growth").value.trim(),
+      minMoisture: Number(document.getElementById("minMoisture").value || 30),
+      notes: document.getElementById("notes").value.trim(),
+      photo
+    });
+
+    if (!plant) {
+      msg.textContent = "Gagal menyimpan plant. Coba login ulang.";
+      return;
+    }
+
+    window.location.href = "./dashboard.html";
+  });
+</script>
+
+
+  <script>
+    // ------- helpers -------
+    const LS = {
+      session: "gp_session",
+      profileKey: (email) => `gp_profile_${email}`,
+      plantsKey: (email) => `gp_plants_${email}`,
+      activePlantKey: (email) => `gp_activePlant_${email}`,
+    };
+
+    function getSession() {
+      if (window.GPAuth?.getSession) return window.GPAuth.getSession();
+      try { return JSON.parse(localStorage.getItem(LS.session)); } catch { return null; }
+    }
+
+    function requireAuth() {
+      const s = getSession();
+      if (!s || !s.email) {
+        window.location.href = "./login.html";
+        return null;
+      }
+      return s;
+    }
+
+    function getProfile(email) {
+      try { return JSON.parse(localStorage.getItem(LS.profileKey(email)) || "{}"); }
+      catch { return {}; }
+    }
+
+    function renderTopbar(session) {
+      const prof = getProfile(session.email);
+
+      const elPhoto = document.querySelector("[data-user-photo]");
+      const elName  = document.querySelector("[data-user-name]");
+      const elEmail = document.querySelector("[data-user-email]");
+
+      // jangan override kalau belum ada photo (biar nggak “hilang”)
+      if (elPhoto && prof.photo) elPhoto.src = prof.photo;
+
+      if (elName)  elName.textContent = prof.name || session.name || "User";
+      if (elEmail) elEmail.textContent = session.email;
+    }
+
+    function setupLogout() {
+      const btn = document.querySelector("[data-logout]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (window.GPAuth?.signOut) window.GPAuth.signOut();
+        localStorage.removeItem(LS.session);
+        window.location.href = "./login.html";
+      });
+    }
+
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+
+    // ------- init -------
+    document.addEventListener("DOMContentLoaded", () => {
+      const session = requireAuth();
+      if (!session) return;
+
+      renderTopbar(session);
+      setupLogout();
+
+      const photoInput = document.getElementById("photo");
+      const preview = document.getElementById("preview");
+      const form = document.getElementById("plantForm");
+      const msg = document.getElementById("msg");
+
+      let photoDataUrl = "";
+
+      photoInput.addEventListener("change", async () => {
+        const f = photoInput.files?.[0];
+        if (!f) return;
+        photoDataUrl = await fileToDataURL(f);
+        preview.src = photoDataUrl;
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = session.email;
+
+        const plant = {
+          id: Date.now().toString(),
+          name: document.getElementById("name").value.trim(),
+          species: document.getElementById("species").value.trim(),
+          plantedOn: document.getElementById("plantedOn").value || "-",
+          growth: document.getElementById("growth").value.trim() || "Healthy — Growing steadily",
+          description: document.getElementById("description").value.trim(),
+          minMoisture: Number(document.getElementById("minMoisture").value || 30),
+          notes: document.getElementById("notes").value.trim(),
+          photo: photoDataUrl || "" // base64
+        };
+
+        if (!plant.name) {
+          msg.textContent = "Plant name wajib diisi.";
+          return;
+        }
+
+        const key = LS.plantsKey(email);
+        const plants = JSON.parse(localStorage.getItem(key) || "[]");
+        plants.push(plant);
+        localStorage.setItem(key, JSON.stringify(plants));
+        localStorage.setItem(LS.activePlantKey(email), plant.id);
+
+        msg.textContent = "Plant saved. Redirecting...";
+        window.location.href = "./dashboard.html";
+      });
+    });
+  </script>
+</body>
+</html>

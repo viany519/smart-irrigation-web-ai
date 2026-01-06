@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greenpulse — Control</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body class="bg-grid-light" data-page="control">
+
+<div class="shell">
+  <div class="app paper">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./assets/logo.svg" alt="greenpulse logo" />
+        greenpulse
+      </div>
+
+      <div class="nav-title">MENU</div>
+      <nav class="nav">
+        <a href="./dashboard.html"><img class="icon" src="./assets/icons/dashboard.svg" />Dashboard</a>
+        <a href="./monitoring.html"><img class="icon" src="./assets/icons/monitoring.svg" />Monitoring</a>
+        <a href="./control.html" class="active"><img class="icon" src="./assets/icons/control.svg" />Control</a>
+        <a href="./history.html"><img class="icon" src="./assets/icons/history.svg" />History</a>
+        <a href="./settings.html"><img class="icon" src="./assets/icons/settings.svg" />Settings</a>
+      </nav>
+
+      <div class="nav-title">GENERAL</div>
+      <nav class="nav">
+        <a href="./profile.html"><img class="icon" src="./assets/icons/profile.svg" />Profile</a>
+        <a href="./help.html"><img class="icon" src="./assets/icons/help.svg" />Help</a>
+        <a href="#" data-logout><img class="icon" src="./assets/icons/logout.svg" />Logout</a>
+      </nav>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="main">
+
+      <!-- ================= TOPBAR ================= -->
+     <div class="topbar">
+          <input class="search" placeholder="Search" />
+          <a class="icon-btn" href="./notification.html" title="Notifications">
+            <img
+            src="./assets/icons/notification.png"
+            alt="Notifications"
+            class="notif-icon"
+            />
+          </a>
+
+        <div class="profile">
+          <img data-user-photo src="./assets/avatar-default.png"
+               onerror="this.src='./assets/avatar-default.png';" />
+          <div>
+            <div class="name" data-user-name>User</div>
+            <div class="email" data-user-email>user@email.com</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= CONTENT ================= -->
+      <div class="content">
+
+        <!-- HEADER -->
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <h1 class="h1">Control</h1>
+            <p class="sub">Input sensor manual (simulasi Arduino) dan cek hasil prediksi AI.</p>
+          </div>
+          <div class="row" style="gap:12px;">
+            <a class="btn btn-outline btn-eq"
+              href="./pickplant.html"
+              data-action="pick-plant">
+              + Pick plant
+            </a>
+            <a class="btn btn-primary btn-eq" href="./monitoring.html">Go Monitoring</a>
+          </div>
+        </div>
+
+        <div style="height:18px;"></div>
+
+        <div class="grid-2">
+
+          <!-- ========== LEFT ========== -->
+          <div class="card big">
+            <b>Manual sensor input</b>
+            <p class="muted">Masukkan nilai sensor lalu klik Predict.</p>
+
+            <label class="muted">Soil moisture</label>
+            <input id="inMoist" class="input" type="number" placeholder="contoh: 680" />
+
+            <label class="muted">Temperature</label>
+            <input id="inTemp" class="input" type="number" placeholder="contoh: 29" />
+
+            <label class="muted">Air humidity</label>
+            <input id="inHum" class="input" type="number" placeholder="contoh: 71" />
+
+            <div class="row" style="gap:12px;margin-top:12px;">
+              <button class="btn btn-outline btn-eq" id="btnPredict">Predict</button>
+              <button class="btn btn-primary btn-eq" id="btnSave" disabled>Save to history</button>
+            </div>
+
+            <p class="muted" style="font-size:12px;margin-top:8px;">
+              Catatan: data masih manual. Jika Arduino real, input diganti API.
+            </p>
+            <!-- ===== SIMULATION MODE (KHUSUS CONTROL) ===== -->
+<label style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+  <input type="checkbox" id="simMode" />
+  <b>Simulation mode (tidak menyimpan ke monitoring)</b>
+</label>
+          </div>
+
+          <!-- ========== RIGHT ========== -->
+          <div class="col" style="gap:14px;">
+
+            <!-- AI DECISION -->
+            <div class="card">
+              <b>AI Decision</b>
+
+              <div id="aiDecision" style="display:none;margin-top:12px;">
+                <div id="aiLabel"
+                     style="display:flex;align-items:center;gap:10px;
+                            font-size:18px;font-weight:900;">
+                  <span id="aiIcon">🌱</span>
+                  <span id="aiText">—</span>
+                </div>
+                <div class="muted" id="aiProb" style="margin-top:4px;">
+                  Prob: —
+                </div>
+
+                <!-- Checkbox (conditional) -->
+                <div id="wateredBox"
+                     style="display:none;margin-top:14px;
+                            border:1px solid rgba(0,0,0,.12);
+                            border-radius:14px;padding:12px;">
+                  <label style="display:flex;gap:10px;align-items:center;">
+                    <input type="checkbox" id="chkWatered" />
+                    <b>Sudah disiram</b>
+                  </label>
+                  <div class="muted" style="font-size:12px;">
+                    Centang jika kamu sudah menyiram setelah AI menyarankan.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <b>Last record</b>
+              <div class="muted" id="lastRecord">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script src="./app.js"></script>
+<script>
+/* ===== AUTH ===== */
+function requireAuth(){
+  const s = localStorage.getItem("gp_session");
+  if(!s){ location.href="./login.html"; return null; }
+  try{ return JSON.parse(s); }catch{ location.href="./login.html"; }
+}
+
+/* ===== PROFILE TOPBAR ===== */
+function renderTopbar(){
+  const u = window.GPData?.getCurrentUser?.();
+  if(!u) return;
+  document.querySelector("[data-user-photo]").src = u.photo || "./assets/avatar-default.png";
+  document.querySelector("[data-user-name]").textContent = u.name || "User";
+  document.querySelector("[data-user-email]").textContent = u.email || "-";
+}
+
+/* ===== LOGOUT ===== */
+document.querySelectorAll("[data-logout]").forEach(b=>{
+  b.onclick=e=>{
+    e.preventDefault();
+    localStorage.removeItem("gp_session");
+    location.href="./login.html";
+  };
+});
+
+/* ===== AI PREDICT ===== */
+function predictLocal(moist){
+  const needWater = moist < 682;
+  return { needWater, prob: needWater ? 0.9 : 0.1 };
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  requireAuth();
+  renderTopbar();
+
+  const inMoist = document.getElementById("inMoist");
+  const inTemp  = document.getElementById("inTemp");
+  const inHum   = document.getElementById("inHum");
+
+  const aiDecision = document.getElementById("aiDecision");
+  const aiIcon = document.getElementById("aiIcon");
+  const aiText = document.getElementById("aiText");
+  const aiProb = document.getElementById("aiProb");
+  const wateredBox = document.getElementById("wateredBox");
+  const chkWatered = document.getElementById("chkWatered");
+
+  const btnSave = document.getElementById("btnSave");
+  const lastRecord = document.getElementById("lastRecord");
+
+  let hasPredicted = false;
+
+  function resetAI(){
+    aiDecision.style.display = "none";
+    wateredBox.style.display = "none";
+    btnSave.disabled = true;
+    hasPredicted = false;
+  }
+
+  [inMoist, inTemp, inHum].forEach(i=>{
+    i.addEventListener("input", resetAI);
+  });
+
+  document.getElementById("btnPredict").onclick = ()=>{
+    if(!inMoist.value) return alert("Isi soil moisture dulu");
+
+    const p = predictLocal(Number(inMoist.value));
+    hasPredicted = true;
+
+    aiDecision.style.display = "block";
+    btnSave.disabled = false;
+
+    if(p.needWater){
+      aiIcon.textContent = "🚿";
+      aiText.textContent = "Perlu disiram";
+      aiText.style.color = "#b00020";
+      wateredBox.style.display = "block";
+      chkWatered.checked = false;
+    }else{
+      aiIcon.textContent = "🌿";
+      aiText.textContent = "Tidak perlu disiram";
+      aiText.style.color = "#0a6b3d";
+      wateredBox.style.display = "none";
+      chkWatered.checked = false;
+    }
+
+    aiProb.textContent = "Prob: " + p.prob;
+  };
+
+document.getElementById("btnSave").onclick = ()=>{
+  if(!hasPredicted) return;
+
+  const email = JSON.parse(localStorage.getItem("gp_session"))?.email;
+  if(!email) return alert("Session error");
+
+  const plantId =
+    localStorage.getItem(`gp_active_plant_${email}`) ||
+    JSON.parse(localStorage.getItem("gp_users") || "[]")
+      .find(u=>u.email===email)?.selectedPlantId;
+
+  if(!plantId) return alert("Plant belum dipilih");
+
+  const payload = {
+    tempC: Number(inTemp.value),
+    moistPct: Number(inMoist.value),
+    humPct: Number(inHum.value),
+    ts: Date.now(),
+    source: "control" // 🔑 pembeda
+  };
+
+  // === TULIS KE STORAGE YANG DIPAKAI MONITORING ===
+  localStorage.setItem(
+    `gp_sensor_${email}_${plantId}`,
+    JSON.stringify(payload)
+  );
+
+  lastRecord.textContent =
+    `${new Date().toLocaleString()} | Moist:${payload.moistPct} | Temp:${payload.tempC} | Hum:${payload.humPct}`;
+
+  alert("Saved & synced to Monitoring ✅");
+};
+
+});
+</script>
+
+</body>
+</html>
