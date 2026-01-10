@@ -15,9 +15,7 @@ def root():
     return {"status": "Greenpulse API running"}
 
 
-# =========================
 # CORS
-# =========================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,9 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# =========================
 # LOAD MODEL
-# =========================
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -37,18 +33,16 @@ model_path = os.path.join(BASE_DIR, "greenpulse_model.joblib")
 model = joblib.load(model_path)
 
 
-# =========================
-# INPUT SCHEMA (TETAP AMAN)
-# =========================
+
+# INPUT SCHEMA 
 class SensorInput(BaseModel):
     soil_temperature: float
     soil_moisture: float
     air_humidity: float
-    plant: str | None = "unknown"   # 🔥 TIDAK WAJIB
+    plant: str | None = "unknown"  
 
-# =========================
+
 # PREDICT + SAVE HISTORY
-# =========================
 @app.post("/predict")
 def predict(data: SensorInput):
     X = np.array([[
@@ -59,7 +53,7 @@ def predict(data: SensorInput):
 
     prob = model.predict_proba(X)[0][1]
 
-    # === RULE + AI (HYBRID, PUNYA KAMU) ===
+    # === RULE + AI (HYBRID) ===
     if data.soil_moisture < 35:
         need_water = 1
         final_prob = max(prob, 0.8)
@@ -69,9 +63,9 @@ def predict(data: SensorInput):
 
     timestamp = datetime.utcnow()
 
-    # =========================
+    
     # SAVE HISTORY (TIDAK MERUSAK API)
-    # =========================
+    
    
 
     return {
@@ -80,9 +74,8 @@ def predict(data: SensorInput):
         "timestamp": timestamp.isoformat()
     }
 
-# =========================
+
 # GET HISTORY (UNTUK history.html)
-# =========================
 @app.get("/api/history")
 def get_history(plant: str | None = None):
     db = SessionLocal()
@@ -95,9 +88,8 @@ def get_history(plant: str | None = None):
     db.close()
     return rows
 
-# =========================
+
 # UPDATE: SUDAH DISIRAM
-# =========================
 @app.patch("/history/{history_id}/watered")
 def mark_watered(history_id: int):
     db = SessionLocal()
