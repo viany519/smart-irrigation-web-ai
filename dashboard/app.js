@@ -289,8 +289,8 @@ window.GPAuth = {
 
   signIn: ({ email, password }) => {
     const user = findUserByEmail(email);
-    if (!user) return { ok: false, message: "Akun belum ada. Kamu harus Sign up dulu." };
-    if (user.password !== password) return { ok: false, message: "Password salah." };
+    if (!user) return { ok: false, message: "Account not found. Please sign up first." };
+if (user.password !== password) return { ok: false, message: "Incorrect password. Please try again." };
 
     setSession(user.email);
     return { ok: true };

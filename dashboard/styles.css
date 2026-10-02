@@ -1733,14 +1733,34 @@ body[data-page="history"] .chart-wrap {
 
 .password-field .toggle-eye {
   position: absolute;
-  right: 14px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  color: rgba(255, 255, 255, 0.65);
   cursor: pointer;
-  font-size: 16px;
-  opacity: 0.6;
+
+  transition: color 0.2s ease;
 }
 
 .password-field .toggle-eye:hover {
-  opacity: 1;
+  color: #ffffff;
+}
+
+.password-field .toggle-eye svg {
+  width: 19px;
+  height: 19px;
+  display: block;
+  pointer-events: none;
+}
+
+.password-field .input {
+  padding-right: 52px;
 }

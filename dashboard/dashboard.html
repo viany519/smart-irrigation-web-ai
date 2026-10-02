@@ -278,8 +278,6 @@
       if (elEmail) elEmail.textContent = session.email;
     }
   
-
-// ===== AI card (temporary local rule; replace with real model/API later) =====
 function gp_getPlantKey(plant) {
   if (!plant) return "selected";
   return (plant.id ?? plant.plantId ?? plant.key ?? plant.name ?? "selected").toString();
@@ -338,6 +336,35 @@ if (!email) return;
  
 const activeId = localStorage.getItem(`gp_active_plant_${email}`);
 const plant = plants.find(p => String(p.id) === String(activeId));
+// Kalau belum ada tanaman, jangan tampilkan hasil AI
+if (!plants.length || !activeId || !plant) {
+  badge.innerHTML = `
+    <a href="./addplant.html"
+       style="
+         display:inline-flex;
+         align-items:center;
+         justify-content:center;
+         text-decoration:none;
+         padding:10px 18px;
+         border-radius:999px;
+         background:#177152;
+         color:#ffffff;
+         font-weight:700;
+       ">
+      + Add plant
+    </a>
+  `;
+
+  badge.style.padding = "0";
+  badge.style.border = "none";
+  badge.style.background = "transparent";
+
+  proba.textContent = "";
+  reason.textContent = "Add a plant first to get an AI watering recommendation.";
+  updated.textContent = "";
+
+  return;
+}
 
   const plantKey = gp_getPlantKey(plant);
 
@@ -355,7 +382,7 @@ const plant = plants.find(p => String(p.id) === String(activeId));
     badge.style.background = "rgba(0,0,0,.04)";
     badge.style.color = "rgba(0,0,0,.65)";
     proba.textContent = "";
-    reason.textContent = "Belum ada input sensor untuk tanaman ini. Isi dulu di menu Control (simulasi Arduino), lalu kembali ke Dashboard.";
+    reason.textContent = "No sensor data yet. Input the plant sensor data first to receive a recommendation.";
     updated.textContent = "";
     return;
   }
@@ -371,7 +398,7 @@ if (pred.needWater) {
   badge.style.color = "#b02a37";
 
   reason.textContent =
-    `Kondisi tanaman memerlukan air! Disarankan penyiraman.`;
+    `The plant needs water. Watering is recommended.`;
 } else {
   // 🟢 HEALTHY
   badge.textContent = "Healthy";
@@ -380,11 +407,12 @@ if (pred.needWater) {
   badge.style.color = "#0d6e56";
 
   reason.textContent =
-    `Kondisi tanaman baik, tidak memerlukan penyiraman`;
+    `The plant is in good condition and does not need watering.`;
 }
 
 
-  proba.textContent = `Confidence (UI): ${(pred.pNeed * 100).toFixed(0)}% need water`;
+ // proba.textContent = `Confidence (UI): ${(pred.pNeed * 100).toFixed(0)}% need water`;
+ proba.textContent = "";
   const ts = tele.ts || tele.timestamp || null;
   updated.textContent = ts ? `Last sensor update: ${new Date(ts).toLocaleString()}` : "";
 

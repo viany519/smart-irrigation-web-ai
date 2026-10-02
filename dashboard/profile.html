@@ -22,7 +22,6 @@
     /* biar aman dari overlay */
     .content, .card, form, input, select, textarea { position: relative; z-index: 2; }
 
-    /* ===== FIX UTAMA: input edit biar jelas ===== */
     #editMode .input,
     #editMode input,
     #editMode textarea,
@@ -42,7 +41,6 @@
       font-weight: 700;
     }
 
-    /* Samain ukuran tombol Back & Edit (+ Cancel/Save juga) */
     .actions .btn,
     .actions a.btn,
     .actions button.btn {
@@ -55,6 +53,85 @@
       align-items: center;
       justify-content: center;
     }
+
+.photo-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+  border: 1px solid rgba(11, 27, 20, 0.10);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.photo-preview {
+  width: 84px;
+  height: 84px;
+  min-width: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef5f1;
+  border: 1px solid rgba(23, 113, 82, 0.16);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-upload-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.photo-upload-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #17231d;
+}
+
+.photo-upload-desc {
+  font-size: 12px;
+  color: rgba(23, 35, 29, 0.60);
+  margin-bottom: 3px;
+}
+
+.photo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #177152;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.photo-upload-btn:hover {
+  background: #125d43;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(23, 113, 82, 0.18);
+}
+
+.photo-upload-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.photo-input-hidden {
+  display: none;
+}
   </style>
 </head>
 
@@ -152,7 +229,7 @@
             <div class="profile-head">
               <div>
                 <h3 style="margin:0 0 6px 0;">Your Biodata</h3>
-                <p class="muted" style="margin:0;">You can update your information anytime :)</p>
+                <p class="muted" style="margin:0;">You can update your information anytime !</p>
               </div>
             </div>
 
@@ -192,16 +269,53 @@
             <div id="editMode" hidden>
               <form id="profileForm" class="col" style="gap:12px;">
 
-                <div class="row" style="gap:14px; align-items:center;">
-                  <img id="editPhotoPreview" class="avatar-xl" src="./assets/avatar-default.png" alt="avatar">
-                  <div class="col" style="gap:8px; flex:1;">
-                    <div class="field">
-                      <label class="muted">Profile photo</label>
-                      <input id="photoInput" type="file" accept="image/*" class="input" />
-                    </div>
-                    <div id="msgPhoto" class="muted hint"></div>
-                  </div>
-                </div>
+                <div class="photo-upload-section">
+
+  <div class="photo-preview">
+    <img
+      id="editPhotoPreview"
+      src="./assets/icons/profile.svg"
+      alt="Profile photo"
+    />
+  </div>
+
+  <div class="photo-upload-info">
+    <div class="photo-upload-title">Profile photo</div>
+
+    <div class="photo-upload-desc">
+      Upload a profile photo in JPG or PNG format.
+    </div>
+
+    <label for="photoInput" class="photo-upload-btn">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 16V4" />
+        <path d="m7 9 5-5 5 5" />
+        <path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4" />
+      </svg>
+
+      Add profile photo
+    </label>
+
+    <input
+      id="photoInput"
+      type="file"
+      accept="image/*"
+      class="photo-input-hidden"
+    />
+
+    <div id="msgPhoto" class="muted hint"></div>
+  </div>
+
+</div>
 
                 <div class="grid-2f">
                   <div class="field">
